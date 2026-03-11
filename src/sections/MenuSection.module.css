@@ -1,0 +1,83 @@
+.section {
+  padding: var(--space-12) var(--space-6);
+  background: var(--color-cream-100);
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 400;
+  color: var(--color-brand-black);
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.tabStrip {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-8);
+  border-bottom: 1px solid var(--color-cream-200);
+}
+
+.tabStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  color: var(--color-brand-black);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-bottom-color var(--duration-fast) var(--easing-default),
+              color var(--duration-fast) var(--easing-default);
+}
+
+.tab:hover {
+  border-bottom-color: var(--color-brand-gold);
+}
+
+.tabActive {
+  border-bottom-color: var(--color-brand-crimson);
+  color: var(--color-brand-crimson);
+  font-weight: 600;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-brand-crimson);
+  outline-offset: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Featured cards span 2 columns in the multi-col grid */
+@media (min-width: 640px) {
+  .grid [data-variant="featured"] {
+    grid-column: span 2;
+  }
+}

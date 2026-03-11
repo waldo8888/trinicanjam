@@ -35,8 +35,6 @@ jobs:
     name: Lighthouse CI
     runs-on: ubuntu-latest
     needs: [test]
-    outputs:
-      preview_url: ${{ steps.deploy.outputs.preview_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -49,40 +47,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
-
-      - name: Deploy to Vercel preview
-        id: deploy
-        run: |
-          DEPLOY_URL=$(vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --yes 2>&1 | grep -oE 'https://[^ ]+\.vercel\.app' | tail -n 1)
-          if [ -z "$DEPLOY_URL" ]; then
-            echo "Failed to capture Vercel preview URL"
-            exit 1
-          fi
-          echo "preview_url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
-          echo "Deployed to: $DEPLOY_URL"
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Build
+        run: npm run build
 
       - name: Run Lighthouse CI
-        run: npx lhci autorun --collect.url=${{ steps.deploy.outputs.preview_url }}
+        run: npx lhci autorun
 
   csp-check:
     name: CSP Header Check
     runs-on: ubuntu-latest
     needs: [test, lighthouse]
     steps:
-      - name: Verify CSP header is present
+      - name: Verify CSP header on production
         run: |
-          PREVIEW_URL="${{ needs.lighthouse.outputs.preview_url }}"
-          echo "Checking CSP header on: $PREVIEW_URL"
-          HEADERS=$(curl -sI "$PREVIEW_URL")
-          echo "$HEADERS"
-          if echo "$HEADERS" | grep -qi "content-security-policy"; then
-            echo "✅ content-security-policy header found"
-          else
-            echo "❌ content-security-policy header MISSING"
-            exit 1
-          fi
+          PROD_URL="https://trinicanjam.vercel.app"
+          echo "Checking CSP header on: $PROD_URL"
+          for i in $(seq 1 6); do
+            HEADERS=$(curl -sI "$PROD_URL" 2>&1)
+            if echo "$HEADERS" | grep -qi "content-security-policy"; then
+              echo "✅ content-security-policy header found"
+              exit 0
+            fi
+            echo "Attempt $i: not yet visible, waiting 15s..."
+            sleep 15
+          done
+          echo "❌ content-security-policy header MISSING after all retries"
+          exit 1

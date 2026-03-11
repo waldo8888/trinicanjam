@@ -1,0 +1,105 @@
+/* =================================================================
+   StickyUtilityBar — Scroll-triggered fixed navigation
+   All colors via data-zone="dark" token cascade — NO hardcoded hex.
+   ================================================================= */
+
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  z-index: var(--z-sticky);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6); /* 24px horizontal padding */
+
+  /* Transition: opacity + pointer-events controlled via inline style.
+     transitionDuration is overridden to 0ms when prefers-reduced-motion is active.
+     transition-property declared here; duration set by JS. */
+  transition-property: opacity;
+  transition-timing-function: ease-out;
+
+  /* Backdrop blur for legibility across all three tonal zones */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* color-mix uses the design token and applies 92% opacity for backdrop translucency.
+     Avoids hardcoded rgba() values per token architecture requirement (Task 2). */
+  background: color-mix(in srgb, var(--color-dark-900) 92%, transparent);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: var(--text-heading); /* 32px–48px fluid — per AC4 spec */
+  color: var(--color-brand-white);
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3); /* 12px between CTAs */
+}
+
+/* Ghost CTA — "Menu" */
+.ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0 var(--space-4); /* 16px horizontal */
+  border: 1px solid var(--color-brand-white);
+  background: transparent;
+  color: var(--color-brand-white);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui); /* 15px fixed */
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.ctaGhost:active {
+  transform: scale(0.96);
+  transition: transform 100ms ease;
+}
+
+/* Filled crimson CTA — "Visit" */
+.ctaCrimson {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0 var(--space-4); /* 16px horizontal */
+  background: var(--color-brand-crimson);
+  color: var(--color-brand-white);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui); /* 15px fixed */
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.ctaCrimson:active {
+  transform: scale(0.96);
+  transition: transform 100ms ease;
+}
+
+/* Mobile: reduce bar height to 52px */
+@media (max-width: 639px) {
+  .bar {
+    height: 52px;
+    padding: 0 var(--space-4); /* 16px on mobile */
+  }
+
+  .wordmark {
+    font-size: var(--text-body); /* slightly smaller wordmark on mobile */
+  }
+}

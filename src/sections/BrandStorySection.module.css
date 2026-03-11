@@ -1,0 +1,29 @@
+/* Structural layout only — colors inherited via data-zone="warm" token cascade */
+/* Zero hex values — all color from CSS custom properties */
+
+.section {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-4);
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-8);
+  /* color inherited from [data-zone="warm"] → --color-brand-black */
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.body p {
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  line-height: var(--leading-loose);
+  /* color inherited from [data-zone="warm"] */
+}

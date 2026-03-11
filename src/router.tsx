@@ -2,6 +2,8 @@ import { createBrowserRouter } from 'react-router-dom'
 import { SEOHead } from '@/lib/seo'
 import { PageWrapper } from '@/sections/PageWrapper'
 import { HeroSection } from '@/sections/HeroSection'
+import { BrandStorySection } from '@/sections/BrandStorySection'
+import { FoodPhotographySection } from '@/sections/FoodPhotographySection'
 
 // Epic 2: HomePage now uses HeroSection (Story 2.2)
 function HomePage() {
@@ -14,6 +16,12 @@ function HomePage() {
       />
       <PageWrapper
         heroSlot={<HeroSection />}
+        contentSlot={
+          <>
+            <BrandStorySection />
+            <FoodPhotographySection />
+          </>
+        }
       />
     </>
   )

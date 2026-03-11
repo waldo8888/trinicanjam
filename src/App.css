@@ -1,0 +1,23 @@
+/* =================================================================
+   APP SCAFFOLD — Temporary placeholder styles (Epic 2 will replace)
+   These classes exist solely to satisfy CSP style-src 'self' —
+   no inline style="" attributes are permitted per ARCH-3 / NFR-S2.
+   ================================================================= */
+
+.app-scaffold {
+  min-height: 100vh;
+  padding: var(--space-8);
+}
+
+.app-scaffold__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  color: var(--color-brand-white);
+  margin-bottom: var(--space-4);
+}
+
+.app-scaffold__body {
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  color: var(--color-brand-white);
+}

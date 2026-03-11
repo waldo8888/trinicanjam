@@ -1,0 +1,23 @@
+/* Structural layout only — colors managed by data-zone selectors in tokens.css */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.zone {
+  width: 100%;
+  position: relative;
+  /* Padding establishes breathing room; exact values tweaked per content in later stories */
+  padding-block: var(--space-16);
+}
+
+.footer {
+  /* Typography uses --font-ui, --text-caption from [data-zone="gradient"] inheritance */
+  font-family: var(--font-ui);
+  font-size: var(--text-caption);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  /* No color property — inherited from [data-zone="gradient"] in tokens.css */
+}

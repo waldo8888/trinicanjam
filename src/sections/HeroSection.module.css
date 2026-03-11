@@ -1,0 +1,65 @@
+/* Structural layout only — colors managed by data-zone + token selectors in tokens.css */
+/* No hex values permitted in this file */
+
+.hero {
+  position: relative;
+  height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* text block sits near bottom of viewport */
+  align-items: center;
+  overflow: hidden;
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-overlay-dark);
+  z-index: 1;
+}
+
+.textContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: var(--space-16) var(--space-4);
+  max-width: 800px;
+  width: 100%;
+}
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.6875rem; /* 11px — no token; smaller than --text-caption (13px) per UX spec */
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-brand-gold);
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  line-height: var(--leading-tight);
+  color: var(--color-brand-white);
+  margin: 0 0 var(--space-4);
+}
+
+.tagline {
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  color: var(--color-brand-white);
+  opacity: 0.8;
+  margin: 0;
+}

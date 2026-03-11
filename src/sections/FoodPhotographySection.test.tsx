@@ -1,10 +1,10 @@
 // vi.mock calls MUST be at the top, before named imports — Vitest hoists them
-vi.mock('@/assets/images/food-1.jpg?w=800&format=webp', () => ({ default: '/mock/food-1.webp' }))
-vi.mock('@/assets/images/food-2.jpg?w=800&format=webp', () => ({ default: '/mock/food-2.webp' }))
-vi.mock('@/assets/images/food-3.jpg?w=800&format=webp', () => ({ default: '/mock/food-3.webp' }))
-vi.mock('@/assets/images/food-4.jpg?w=800&format=webp', () => ({ default: '/mock/food-4.webp' }))
-vi.mock('@/assets/images/food-5.jpg?w=800&format=webp', () => ({ default: '/mock/food-5.webp' }))
-vi.mock('@/assets/images/food-6.jpg?w=800&format=webp', () => ({ default: '/mock/food-6.webp' }))
+vi.mock('@/assets/images/food-1.jpg', () => ({ default: '/mock/food-1.webp' }))
+vi.mock('@/assets/images/food-2.jpg', () => ({ default: '/mock/food-2.webp' }))
+vi.mock('@/assets/images/food-3.jpg', () => ({ default: '/mock/food-3.webp' }))
+vi.mock('@/assets/images/food-4.jpg', () => ({ default: '/mock/food-4.webp' }))
+vi.mock('@/assets/images/food-5.jpg', () => ({ default: '/mock/food-5.webp' }))
+vi.mock('@/assets/images/food-6.jpg', () => ({ default: '/mock/food-6.webp' }))
 
 import { render, screen } from '@testing-library/react'
 import { FoodPhotographySection } from './FoodPhotographySection'

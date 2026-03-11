@@ -1,6 +1,60 @@
+import { useRef, useState } from 'react'
+import { useReducedMotion } from '@/lib/useReducedMotion'
 import styles from './HeroSection.module.css'
 
 export function HeroSection() {
+  const prefersReducedMotion = useReducedMotion()
+  const [loaded, setLoaded] = useState(prefersReducedMotion)
+
+  const imageRef = useRef<HTMLImageElement>(null)
+  const eyebrowRef = useRef<HTMLSpanElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const taglineRef = useRef<HTMLParagraphElement>(null)
+
+  const handleLoad = () => {
+    if (prefersReducedMotion) {
+      setLoaded(true)
+      return
+    }
+
+    if (
+      !eyebrowRef.current ||
+      !titleRef.current ||
+      !taglineRef.current ||
+      !imageRef.current
+    ) {
+      setLoaded(true)
+      return
+    }
+
+    void (async () => {
+      try {
+        const { animateHeroEntrance } = await import('@/lib/animations/heroEntrance')
+
+        await animateHeroEntrance(
+          {
+            eyebrow: eyebrowRef.current!,
+            title: titleRef.current!,
+            tagline: taglineRef.current!,
+            image: imageRef.current!,
+          },
+          {
+            onReady: () => setLoaded(true),
+          }
+        )
+      } catch {
+        setLoaded(true)
+      }
+    })()
+  }
+
+  const handleError = () => {
+    // AC6: Never leave the section broken — show text immediately on image error
+    setLoaded(true)
+  }
+
+  const isTextHidden = !loaded && !prefersReducedMotion
+
   return (
     <section role="banner" data-zone="dark" className={styles.hero}>
       {/*
@@ -9,6 +63,7 @@ export function HeroSection() {
         (causes an erroneous 404 network request).
       */}
       <img
+        ref={imageRef}
         src="/assets/images/hero.webp"
         alt="Restaurant interior and food presentation at Trinicanjam Cuisine"
         width={1920}
@@ -16,21 +71,32 @@ export function HeroSection() {
         fetchPriority="high"
         loading="eager"
         className={styles.heroImage}
+        onLoad={handleLoad}
+        onError={handleError}
       />
-      {/* Decorative dark overlay for text contrast — aria-hidden per AC6 */}
+      {/* Decorative dark overlay for text contrast */}
       <div className={styles.overlay} aria-hidden="true" />
-      <div className={styles.textContent}>
-        {/*
-          eyebrow, title, tagline are animation targets for Story 2.6 (GSAP entrance).
-          These elements must remain as separate DOM nodes — Story 2.6 needs individual refs.
-          GSAP entrance animation — see Story 2.6; import dynamically only, never at module level.
-          useReducedMotion hook — see Story 2.5; wired into HeroSection in Story 2.6.
-        */}
-        <span className={styles.eyebrow}>
+      {/* Shimmer loading state — hidden when loaded or reduced motion */}
+      {isTextHidden && (
+        <div className={styles.shimmer} aria-hidden="true" />
+      )}
+      <div
+        className={[
+          styles.textContent,
+          isTextHidden ? styles.textHidden : '',
+        ]
+          .join(' ')
+          .trim()}
+      >
+        <span ref={eyebrowRef} className={styles.eyebrow}>
           Authentic Caribbean Cuisine · Hamilton, Ontario
         </span>
-        <h1 className={styles.title}>Trinicanjam Cuisine</h1>
-        <p className={styles.tagline}>Caribbean Soul. Hamilton Table.</p>
+        <h1 ref={titleRef} className={styles.title}>
+          Trinicanjam Cuisine
+        </h1>
+        <p ref={taglineRef} className={styles.tagline}>
+          Caribbean Soul. Hamilton Table.
+        </p>
       </div>
     </section>
   )

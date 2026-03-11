@@ -1,5 +1,31 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+// Mocks must be at file top — Vitest hoists these before imports
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+
+vi.mock('gsap', () => ({
+  gsap: {
+    set: vi.fn(),
+    timeline: vi.fn(() => ({
+      from: vi.fn().mockReturnThis(),
+      fromTo: vi.fn().mockReturnThis(),
+      to: vi.fn().mockReturnThis(),
+    })),
+  },
+}))
+
+vi.mock('@/lib/useReducedMotion', () => ({
+  useReducedMotion: vi.fn(() => false), // default: no reduced motion
+}))
+
+vi.mock('@/lib/animations/heroEntrance', () => ({
+  animateHeroEntrance: vi.fn((_, options?: { onReady?: () => void }) => {
+    options?.onReady?.()
+    return Promise.resolve()
+  }),
+}))
+
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { useReducedMotion } from '@/lib/useReducedMotion'
+import { animateHeroEntrance } from '@/lib/animations/heroEntrance'
 import { HeroSection } from '@/sections/HeroSection'
 
 describe('HeroSection', () => {
@@ -66,5 +92,96 @@ describe('HeroSection', () => {
     const img = screen.getByRole('img')
     expect(img.getAttribute('width')).toBe('1920')
     expect(img.getAttribute('height')).toBe('1080')
+  })
+})
+
+describe('HeroSection loading states', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(useReducedMotion).mockReturnValue(false)
+    vi.mocked(animateHeroEntrance).mockImplementation((_, options?: { onReady?: () => void }) => {
+      options?.onReady?.()
+      return Promise.resolve()
+    })
+  })
+
+  it('hides text on initial render (visibility hidden)', () => {
+    const { container } = render(<HeroSection />)
+    const textContent = container.querySelector('[class*="textContent"]')
+    expect(textContent?.className).toMatch(/textHidden/)
+  })
+
+  it('renders shimmer overlay on initial render', () => {
+    const { container } = render(<HeroSection />)
+    const shimmer = container.querySelector('[class*="shimmer"]')
+    expect(shimmer).toBeInTheDocument()
+    expect(shimmer).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('removes shimmer and shows text after onLoad', async () => {
+    const { container } = render(<HeroSection />)
+    const img = screen.getByRole('img')
+    fireEvent.load(img)
+
+    await waitFor(() => {
+      const shimmer = container.querySelector('[class*="shimmer"]')
+      expect(shimmer).not.toBeInTheDocument()
+    })
+
+    const textContent = container.querySelector('[class*="textContent"]')
+    expect(textContent?.className).not.toMatch(/textHidden/)
+  })
+
+  it('calls animateHeroEntrance after onLoad (normal motion)', async () => {
+    render(<HeroSection />)
+    const img = screen.getByRole('img')
+    fireEvent.load(img)
+
+    await waitFor(() => {
+      expect(animateHeroEntrance).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('removes shimmer and shows text after onError (broken image)', () => {
+    const { container } = render(<HeroSection />)
+    const img = screen.getByRole('img')
+    fireEvent.error(img)
+
+    const shimmer = container.querySelector('[class*="shimmer"]')
+    expect(shimmer).not.toBeInTheDocument()
+
+    const textContent = container.querySelector('[class*="textContent"]')
+    expect(textContent?.className).not.toMatch(/textHidden/)
+  })
+
+  it('does NOT call animateHeroEntrance after onError', () => {
+    render(<HeroSection />)
+    const img = screen.getByRole('img')
+    fireEvent.error(img)
+    expect(animateHeroEntrance).not.toHaveBeenCalled()
+  })
+})
+
+describe('HeroSection with prefers-reduced-motion', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(useReducedMotion).mockReturnValue(true)
+  })
+
+  it('shows text immediately with no shimmer when reduced motion is active', () => {
+    const { container } = render(<HeroSection />)
+
+    const shimmer = container.querySelector('[class*="shimmer"]')
+    expect(shimmer).not.toBeInTheDocument()
+
+    const textContent = container.querySelector('[class*="textContent"]')
+    expect(textContent?.className).not.toMatch(/textHidden/)
+  })
+
+  it('does NOT call animateHeroEntrance when reduced motion is active', () => {
+    render(<HeroSection />)
+    const img = screen.getByRole('img')
+    fireEvent.load(img)
+    expect(animateHeroEntrance).not.toHaveBeenCalled()
   })
 })

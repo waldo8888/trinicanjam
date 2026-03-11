@@ -2,13 +2,25 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { routes } from '@/router'
+import { TonalZoneProvider } from '@/context/TonalZoneContext'
+
+// Mock food photo imports so vite-imagetools does not run Sharp on placeholder images
+vi.mock('@/assets/images/food-1.jpg', () => ({ default: '/mock/food-1.webp' }))
+vi.mock('@/assets/images/food-2.jpg', () => ({ default: '/mock/food-2.webp' }))
+vi.mock('@/assets/images/food-3.jpg', () => ({ default: '/mock/food-3.webp' }))
+vi.mock('@/assets/images/food-4.jpg', () => ({ default: '/mock/food-4.webp' }))
+vi.mock('@/assets/images/food-5.jpg', () => ({ default: '/mock/food-5.webp' }))
+vi.mock('@/assets/images/food-6.jpg', () => ({ default: '/mock/food-6.webp' }))
 
 function renderAt(path: string) {
   const testRouter = createMemoryRouter(routes, {
     initialEntries: [path],
-    future: { v7_startTransition: true },
   })
-  render(<RouterProvider router={testRouter} />)
+  render(
+    <TonalZoneProvider>
+      <RouterProvider router={testRouter} />
+    </TonalZoneProvider>,
+  )
 }
 
 describe('router', () => {

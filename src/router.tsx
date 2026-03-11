@@ -4,6 +4,8 @@ import { PageWrapper } from '@/sections/PageWrapper'
 import { HeroSection } from '@/sections/HeroSection'
 import { BrandStorySection } from '@/sections/BrandStorySection'
 import { FoodPhotographySection } from '@/sections/FoodPhotographySection'
+import { MenuSection } from '@/sections/MenuSection'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 // Epic 2: HomePage now uses HeroSection (Story 2.2)
 function HomePage() {
@@ -20,6 +22,9 @@ function HomePage() {
           <>
             <BrandStorySection />
             <FoodPhotographySection />
+            <ErrorBoundary>
+              <MenuSection />
+            </ErrorBoundary>
           </>
         }
       />
@@ -68,6 +73,4 @@ export const routes = [
   { path: '*', element: <NotFoundPage /> },
 ]
 
-export const router = createBrowserRouter(routes, {
-  future: { v7_startTransition: true },
-})
+export const router = createBrowserRouter(routes)

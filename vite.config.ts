@@ -5,7 +5,14 @@ import { imagetools } from 'vite-imagetools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), imagetools()],
+  plugins: [
+    react(),
+    imagetools({
+      // Apply w=800&format=webp to all image imports by default, removing the
+      // need for query strings in TypeScript source (which tsc cannot type-check).
+      defaultDirectives: new URLSearchParams('w=800&format=webp'),
+    }),
+  ],
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
   },

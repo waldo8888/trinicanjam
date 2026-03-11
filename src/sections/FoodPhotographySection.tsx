@@ -1,9 +1,9 @@
-import photo1 from '@/assets/images/food-1.jpg?w=800&format=webp'
-import photo2 from '@/assets/images/food-2.jpg?w=800&format=webp'
-import photo3 from '@/assets/images/food-3.jpg?w=800&format=webp'
-import photo4 from '@/assets/images/food-4.jpg?w=800&format=webp'
-import photo5 from '@/assets/images/food-5.jpg?w=800&format=webp'
-import photo6 from '@/assets/images/food-6.jpg?w=800&format=webp'
+import photo1 from '@/assets/images/food-1.jpg'
+import photo2 from '@/assets/images/food-2.jpg'
+import photo3 from '@/assets/images/food-3.jpg'
+import photo4 from '@/assets/images/food-4.jpg'
+import photo5 from '@/assets/images/food-5.jpg'
+import photo6 from '@/assets/images/food-6.jpg'
 import styles from './FoodPhotographySection.module.css'
 
 interface FoodPhoto {

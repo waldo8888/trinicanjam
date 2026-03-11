@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "startServerCommand": "npx serve dist -p 3000",
-      "startServerReadyPattern": "Accepting connections",
+      "startServerReadyPattern": "Serving",
       "url": ["http://localhost:3000"],
       "numberOfRuns": 1,
       "settings": {

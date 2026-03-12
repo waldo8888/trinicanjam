@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components -- page components are intentionally co-located with router config (ARCH-9) */
 import { createBrowserRouter } from 'react-router-dom'
-import { SEOHead } from '@/lib/seo'
+import { SEOHead, SITE_URL } from '@/lib/seo'
 import { PageWrapper } from '@/sections/PageWrapper'
 import { HeroSection } from '@/sections/HeroSection'
 import { BrandStorySection } from '@/sections/BrandStorySection'
@@ -12,8 +13,11 @@ function HomePage() {
   return (
     <>
       <SEOHead
-        title="Home"
-        description="Trinicanjam Cuisine — Authentic Trinidadian and Jamaican food in Hamilton, Ontario. Caribbean Soul. Hamilton Table."
+        title="Trinicanjam Cuisine — Caribbean Soul, Hamilton Table"
+        description="Premium Caribbean cuisine in Hamilton, Ontario. Trinidadian and Jamaican flavours, family-owned. Open Tuesday–Sunday."
+        ogImage={`${SITE_URL}/assets/og-image.jpg`}
+        ogType="website"
+        ogUrl={SITE_URL}
         preloadHeroImage="/assets/images/hero.webp"
       />
       <PageWrapper
@@ -35,6 +39,12 @@ function HomePage() {
 function MenuPage() {
   return (
     <main>
+      <SEOHead
+        title="Menu"
+        description="Browse the full Trinicanjam Cuisine menu — Trinidadian & Jamaican starters, mains, and drinks in Hamilton, Ontario."
+        ogImage={`${SITE_URL}/assets/og-image.jpg`}
+        ogUrl={`${SITE_URL}/menu`}
+      />
       <h1>Menu</h1>
     </main>
   )
@@ -43,6 +53,12 @@ function MenuPage() {
 function VisitPage() {
   return (
     <main>
+      <SEOHead
+        title="Visit"
+        description="Find Trinicanjam Cuisine in Hamilton, Ontario — address, opening hours, directions, and contact information."
+        ogImage={`${SITE_URL}/assets/og-image.jpg`}
+        ogUrl={`${SITE_URL}/visit`}
+      />
       <h1>Visit</h1>
     </main>
   )
@@ -51,6 +67,12 @@ function VisitPage() {
 function AboutPage() {
   return (
     <main>
+      <SEOHead
+        title="About"
+        description="The story behind Trinicanjam Cuisine — Caribbean culinary roots, Hamilton Ontario, and a table for everyone."
+        ogImage={`${SITE_URL}/assets/og-image.jpg`}
+        ogUrl={`${SITE_URL}/about`}
+      />
       <h1>About</h1>
     </main>
   )

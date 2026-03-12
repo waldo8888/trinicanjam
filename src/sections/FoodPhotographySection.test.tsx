@@ -41,4 +41,13 @@ describe('FoodPhotographySection', () => {
     const grid = container.querySelector('[class*="grid"]')
     expect(grid).not.toBeNull()
   })
+
+  it('all images have explicit width=800 and height=600 to prevent CLS', () => {
+    const { container } = render(<FoodPhotographySection />)
+    const images = Array.from(container.querySelectorAll('img'))
+    images.forEach((img) => {
+      expect(img).toHaveAttribute('width', '800')
+      expect(img).toHaveAttribute('height', '600')
+    })
+  })
 })

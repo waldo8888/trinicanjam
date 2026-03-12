@@ -1,3 +1,7 @@
+// NOTE: Images are imported without explicit query params (e.g., ?w=800&format=webp)
+// because vite.config.ts applies `defaultDirectives: 'w=800&format=webp'` globally via
+// imagetools(). If defaultDirectives is ever removed from vite.config.ts, these imports
+// will no longer produce WebP-optimised output at build time.
 import photo1 from '@/assets/images/food-1.jpg'
 import photo2 from '@/assets/images/food-2.jpg'
 import photo3 from '@/assets/images/food-3.jpg'
@@ -11,6 +15,7 @@ interface FoodPhoto {
   src: string
   alt: string
   loading: 'eager' | 'lazy'
+  fetchPriority?: 'high' | 'low' | 'auto'
 }
 
 const FOOD_PHOTOS: FoodPhoto[] = [
@@ -19,6 +24,7 @@ const FOOD_PHOTOS: FoodPhoto[] = [
     src: photo1,
     alt: 'Jerk chicken served with rice and peas at Trinicanjam Cuisine',
     loading: 'eager',
+    fetchPriority: 'high',
   },
   {
     id: 'food-2',
@@ -54,7 +60,10 @@ const FOOD_PHOTOS: FoodPhoto[] = [
 
 export function FoodPhotographySection() {
   return (
-    <section aria-label="Food photography" className={styles.section}>
+    <section aria-labelledby="food-photography-heading" className={styles.section}>
+      <h2 id="food-photography-heading" className={styles.srOnly}>
+        From Our Kitchen
+      </h2>
       <div className={styles.grid}>
         {FOOD_PHOTOS.map((photo) => (
           <div key={photo.id} className={styles.cell}>
@@ -64,6 +73,7 @@ export function FoodPhotographySection() {
               width={800}
               height={600}
               loading={photo.loading}
+              fetchPriority={photo.fetchPriority}
               className={styles.image}
             />
           </div>

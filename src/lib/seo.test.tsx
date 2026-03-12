@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { render, cleanup } from '@testing-library/react'
-import { SEOHead } from '@/lib/seo'
+import { SEOHead, SITE_URL } from '@/lib/seo'
 
 afterEach(() => {
   cleanup()
@@ -75,5 +75,54 @@ describe('SEOHead', () => {
   it('omits preload link when preloadHeroImage is not provided', () => {
     render(<SEOHead title="Menu" description="Browse our Caribbean dishes" />)
     expect(document.querySelector('link[rel="preload"]')).toBeNull()
+  })
+
+  it('renders og:url when ogUrl prop is provided', () => {
+    render(<SEOHead title="Home" description="desc" ogUrl="https://trinicanjam.ca" />)
+    expect(
+      document.querySelector('meta[property="og:url"]')?.getAttribute('content'),
+    ).toBe('https://trinicanjam.ca')
+  })
+
+  it('omits og:url when ogUrl is not provided', () => {
+    render(<SEOHead title="Home" description="desc" />)
+    expect(document.querySelector('meta[property="og:url"]')).toBeNull()
+  })
+
+  it('renders twitter:image when ogImage is provided', () => {
+    render(
+      <SEOHead
+        title="Home"
+        description="desc"
+        ogImage="https://trinicanjam.ca/assets/og-image.jpg"
+      />,
+    )
+    expect(
+      document.querySelector('meta[name="twitter:image"]')?.getAttribute('content'),
+    ).toBe('https://trinicanjam.ca/assets/og-image.jpg')
+  })
+
+  it('omits twitter:image when ogImage is not provided', () => {
+    render(<SEOHead title="Home" description="desc" />)
+    expect(document.querySelector('meta[name="twitter:image"]')).toBeNull()
+  })
+
+  it('renders og:type with custom value when ogType prop is provided', () => {
+    render(<SEOHead title="Home" description="desc" ogType="article" />)
+    expect(document.querySelector('meta[property="og:type"]')?.getAttribute('content')).toBe('article')
+  })
+
+  it('renders og:type as website by default', () => {
+    render(<SEOHead title="Home" description="desc" />)
+    expect(document.querySelector('meta[property="og:type"]')?.getAttribute('content')).toBe('website')
+  })
+
+  it('renders twitter:card with custom value when twitterCard prop is provided', () => {
+    render(<SEOHead title="Home" description="desc" twitterCard="summary" />)
+    expect(document.querySelector('meta[name="twitter:card"]')?.getAttribute('content')).toBe('summary')
+  })
+
+  it('exports SITE_URL constant as the production domain', () => {
+    expect(SITE_URL).toBe('https://trinicanjam.ca')
   })
 })

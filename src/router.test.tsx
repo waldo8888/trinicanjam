@@ -50,7 +50,7 @@ describe('router', () => {
 
   it('renders AboutPage heading at /about', () => {
     renderAt('/about')
-    expect(screen.getByRole('heading', { name: 'About' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: /Our Story/i })).toBeTruthy()
   })
 
   it('renders NotFoundPage for unmatched routes', () => {

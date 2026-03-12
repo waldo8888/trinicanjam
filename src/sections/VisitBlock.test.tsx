@@ -41,4 +41,16 @@ describe('VisitBlock', () => {
     expect(link.getAttribute('rel')).toContain('noopener')
     expect(link.getAttribute('rel')).toContain('noreferrer')
   })
+
+  it('renders the embedded map context before the CTAs', () => {
+    vi.stubEnv('VITE_MAPS_EMBED_KEY', '')
+
+    render(<VisitBlock />)
+
+    const caption = screen.getByText('Trinicanjam Cuisine — Hamilton, Ontario')
+    const directions = screen.getByRole('link', { name: /Get Directions/i })
+
+    expect(screen.getByText('Map loading…')).toBeInTheDocument()
+    expect(caption.compareDocumentPosition(directions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
 })

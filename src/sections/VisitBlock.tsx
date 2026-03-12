@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { MapEmbed } from '@/components/MapEmbed/MapEmbed'
 import { trackDirectionsClick, trackHoursView, trackPhoneClick } from '@/lib/analytics'
 import styles from './VisitBlock.module.css'
 
@@ -75,6 +76,8 @@ export function VisitBlock() {
             (905) 555-1234
           </a>
         </p>
+
+        <MapEmbed />
 
         <div className={styles.ctas}>
           <a

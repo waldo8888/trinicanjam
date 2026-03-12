@@ -8,6 +8,7 @@ import { FoodPhotographySection } from '@/sections/FoodPhotographySection'
 import { MenuSection } from '@/sections/MenuSection'
 import { VisitBlock } from '@/sections/VisitBlock'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { AboutPage } from '@/pages/AboutPage'
 
 // Epic 2: HomePage now uses HeroSection (Story 2.2)
 function HomePage() {
@@ -71,20 +72,7 @@ function VisitPage() {
   )
 }
 
-function AboutPage() {
-  return (
-    <main>
-      <SEOHead
-        title="About"
-        description="The story behind Trinicanjam Cuisine — Caribbean culinary roots, Hamilton Ontario, and a table for everyone."
-        ogImage={`${SITE_URL}/assets/og-image.jpg`}
-        ogUrl={`${SITE_URL}/about`}
-        canonical={`${SITE_URL}/about`}
-      />
-      <h1>About</h1>
-    </main>
-  )
-}
+// AboutPage is a dedicated file under src/pages/ (Story 5.4)
 
 function NotFoundPage() {
   return (

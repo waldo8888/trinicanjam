@@ -3,3 +3,11 @@
 
 // Build-time constant injected by vite.config.ts `define` block
 declare const __GA4_ID__: string
+
+interface ImportMetaEnv {
+	readonly VITE_MAPS_EMBED_KEY: string
+}
+
+interface ImportMeta {
+	readonly env: ImportMetaEnv
+}

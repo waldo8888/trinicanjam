@@ -7,7 +7,7 @@ afterEach(() => {
   // Explicitly remove hoisted metadata between tests to guard against jsdom persistence
   document.head
     .querySelectorAll(
-      'title, meta[name="description"], meta[property^="og:"], meta[name^="twitter:"], link[rel="preload"], script[type="application/ld+json"]',
+      'title, meta[name="description"], meta[property^="og:"], meta[name^="twitter:"], link[rel="preload"], link[rel="canonical"], link[rel="alternate"], script[type="application/ld+json"]',
     )
     .forEach((el) => el.remove())
 })
@@ -125,7 +125,73 @@ describe('SEOHead', () => {
   it('exports SITE_URL constant as the production domain', () => {
     expect(SITE_URL).toBe('https://trinicanjam.ca')
   })
+
+  it('uses title as-is when noSuffix is true', () => {
+    render(
+      <SEOHead
+        title="Trinicanjam Cuisine — Caribbean Soul, Hamilton Table"
+        description="desc"
+        noSuffix
+      />,
+    )
+    expect(document.title).toBe('Trinicanjam Cuisine — Caribbean Soul, Hamilton Table')
+  })
 })
+
+describe('SEOHead — canonical and hreflang', () => {
+  it('renders canonical link when canonical prop is provided', () => {
+    render(
+      <SEOHead
+        title="Menu"
+        description="Browse our menu"
+        canonical="https://trinicanjam.ca/menu"
+      />,
+    )
+    expect(
+      document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+    ).toBe('https://trinicanjam.ca/menu')
+  })
+
+  it('renders hreflang="en" alternate link when canonical prop is provided', () => {
+    render(
+      <SEOHead
+        title="Menu"
+        description="Browse our menu"
+        canonical="https://trinicanjam.ca/menu"
+      />,
+    )
+    const hreflang = document.querySelector('link[rel="alternate"][hreflang="en"]')
+    expect(hreflang).toBeTruthy()
+    expect(hreflang?.getAttribute('href')).toBe('https://trinicanjam.ca/menu')
+  })
+
+  it('omits canonical link when canonical prop is not provided', () => {
+    render(<SEOHead title="Menu" description="Browse our menu" />)
+    expect(document.querySelector('link[rel="canonical"]')).toBeNull()
+  })
+
+  it('omits hreflang alternate link when canonical prop is not provided', () => {
+    render(<SEOHead title="Menu" description="Browse our menu" />)
+    expect(document.querySelector('link[rel="alternate"]')).toBeNull()
+  })
+
+  it('canonical and hreflang href values are identical', () => {
+    render(
+      <SEOHead
+        title="Home"
+        description="Trinicanjam home"
+        canonical="https://trinicanjam.ca"
+      />,
+    )
+    const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href')
+    const hreflang = document
+      .querySelector('link[rel="alternate"][hreflang="en"]')
+      ?.getAttribute('href')
+    expect(canonical).toBe(hreflang)
+    expect(canonical).toBe('https://trinicanjam.ca')
+  })
+})
+
 
 describe('RestaurantSchema', () => {
   it('renders a script tag with type application/ld+json', () => {

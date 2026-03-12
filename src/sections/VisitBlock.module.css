@@ -1,0 +1,128 @@
+.section {
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-brand-white);
+}
+
+.heading {
+  margin: 0 0 var(--space-8);
+  color: var(--color-brand-white);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 400;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: min(100%, 40rem);
+  margin: 0 auto;
+}
+
+.address {
+  color: var(--color-cream-200);
+  font-family: var(--font-ui);
+  font-style: normal;
+  line-height: var(--leading-loose);
+}
+
+.neighbourhood {
+  color: var(--color-brand-gold);
+  font-size: var(--text-caption);
+}
+
+.hoursTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+}
+
+.hoursTable thead th {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-brand-gold);
+  color: var(--color-brand-gold);
+  font-weight: 500;
+  text-align: left;
+}
+
+.hoursTable tbody td {
+  padding: var(--space-2) var(--space-4);
+}
+
+.todayRow {
+  background: var(--color-brand-crimson);
+  color: var(--color-brand-white);
+  font-weight: 600;
+}
+
+.phone {
+  margin: 0;
+  color: var(--color-cream-200);
+  font-family: var(--font-ui);
+}
+
+.phoneLink {
+  color: var(--color-cta-web);
+  text-decoration: underline;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.ctaPrimary,
+.ctaOutlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-8);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  text-decoration: none;
+  transition: opacity var(--duration-fast) var(--easing-default), transform var(--duration-fast) var(--easing-default);
+}
+
+.ctaPrimary {
+  background: var(--color-brand-crimson);
+  color: var(--color-brand-white);
+}
+
+.ctaOutlined {
+  border: 2px solid var(--color-brand-white);
+  background: transparent;
+  color: var(--color-brand-white);
+}
+
+.ctaPrimary:hover,
+.ctaOutlined:hover {
+  opacity: 0.85;
+}
+
+.ctaPrimary:active,
+.ctaOutlined:active {
+  transform: scale(0.96);
+}
+
+@media (min-width: 40rem) {
+  .section {
+    padding-block: var(--space-16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctaPrimary,
+  .ctaOutlined {
+    transition: none;
+  }
+
+  .ctaPrimary:active,
+  .ctaOutlined:active {
+    transform: none;
+  }
+}

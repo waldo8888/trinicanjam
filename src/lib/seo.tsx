@@ -47,7 +47,9 @@ interface SEOHeadProps {
   ogType?: string
   ogUrl?: string
   twitterCard?: string
-  preloadHeroImage?: string // LCP optimization — renders <link rel="preload"> for hero image
+  canonical?: string         // renders <link rel="canonical"> and <link rel="alternate" hreflang="en">
+  noSuffix?: boolean         // when true, title is used as-is without "| Trinicanjam Cuisine" suffix
+  preloadHeroImage?: string  // LCP optimization — renders <link rel="preload"> for hero image
 }
 
 export function SEOHead({
@@ -57,11 +59,16 @@ export function SEOHead({
   ogType = 'website',
   ogUrl,
   twitterCard = 'summary_large_image',
+  canonical,
+  noSuffix,
   preloadHeroImage,
 }: SEOHeadProps) {
-  const fullTitle = `${title} | Trinicanjam Cuisine`
+  const fullTitle = noSuffix ? title : `${title} | Trinicanjam Cuisine`
   if (import.meta.env.DEV && ogImage && !ogImage.startsWith('http')) {
     console.warn('[SEOHead] ogImage must be an absolute URL for OG/Twitter cards. Received:', ogImage)
+  }
+  if (import.meta.env.DEV && canonical && !canonical.startsWith('http')) {
+    console.warn('[SEOHead] canonical must be an absolute URL. Received:', canonical)
   }
   return (
     <>
@@ -70,6 +77,8 @@ export function SEOHead({
       )}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
+      {canonical && <link rel="canonical" href={canonical} />}
+      {canonical && <link rel="alternate" hrefLang="en" href={canonical} />}
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:type" content={ogType} />

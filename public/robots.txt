@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://trinicanjam.ca/sitemap.xml

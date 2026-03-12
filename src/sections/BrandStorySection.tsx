@@ -125,7 +125,7 @@ export function BrandStorySection() {
           </div>
           <div className={`${styles.imageWrapper} ${styles.secondaryImage}`}>
             <img 
-              src="/assets/images/gallery/chef.png" 
+              src="/images/chef_cooking_1773324679875.png" 
               alt="Chef cooking with dramatic flame in a Caribbean kitchen"
               loading="lazy" 
             />

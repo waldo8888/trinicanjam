@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 export const SITE_URL = 'https://trinicanjam.ca'
 
 // Restaurant JSON-LD schema — all fields are placeholder values marked TODO where real data is needed
@@ -52,6 +54,45 @@ interface SEOHeadProps {
   preloadHeroImage?: string  // LCP optimization — renders <link rel="preload"> for hero image
 }
 
+function upsertMeta(attributeName: 'name' | 'property', attributeValue: string, content?: string) {
+  const selector = `meta[${attributeName}="${attributeValue}"]`
+  const existing = document.head.querySelector(selector)
+
+  if (!content) {
+    existing?.remove()
+    return
+  }
+
+  const meta = existing ?? document.createElement('meta')
+  meta.setAttribute(attributeName, attributeValue)
+  meta.setAttribute('content', content)
+
+  if (!existing) {
+    document.head.appendChild(meta)
+  }
+}
+
+function upsertLink(selector: string, attributes: Record<string, string>, href?: string) {
+  const existing = document.head.querySelector(selector)
+
+  if (!href) {
+    existing?.remove()
+    return
+  }
+
+  const link = existing ?? document.createElement('link')
+
+  Object.entries(attributes).forEach(([name, value]) => {
+    link.setAttribute(name, value)
+  })
+
+  link.setAttribute('href', href)
+
+  if (!existing) {
+    document.head.appendChild(link)
+  }
+}
+
 export function SEOHead({
   title,
   description,
@@ -64,39 +105,63 @@ export function SEOHead({
   preloadHeroImage,
 }: SEOHeadProps) {
   const fullTitle = noSuffix ? title : `${title} | Trinicanjam Cuisine`
+
   if (import.meta.env.DEV && ogImage && !ogImage.startsWith('http')) {
     console.warn('[SEOHead] ogImage must be an absolute URL for OG/Twitter cards. Received:', ogImage)
   }
+
   if (import.meta.env.DEV && canonical && !canonical.startsWith('http')) {
     console.warn('[SEOHead] canonical must be an absolute URL. Received:', canonical)
   }
-  return (
-    <>
-      {preloadHeroImage && (
-        <link rel="preload" as="image" href={preloadHeroImage} fetchPriority="high" />
-      )}
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      {canonical && <link rel="canonical" href={canonical} />}
-      {canonical && <link rel="alternate" hrefLang="en" href={canonical} />}
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={ogType} />
-      {ogUrl && <meta property="og:url" content={ogUrl} />}
-      {ogImage && <meta property="og:image" content={ogImage} />}
-      <meta name="twitter:card" content={twitterCard} />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      {ogImage && <meta name="twitter:image" content={ogImage} />}
-    </>
-  )
+
+  useEffect(() => {
+    document.title = fullTitle
+
+    upsertMeta('name', 'description', description)
+    upsertMeta('property', 'og:title', fullTitle)
+    upsertMeta('property', 'og:description', description)
+    upsertMeta('property', 'og:type', ogType)
+    upsertMeta('property', 'og:url', ogUrl)
+    upsertMeta('property', 'og:image', ogImage)
+    upsertMeta('name', 'twitter:card', twitterCard)
+    upsertMeta('name', 'twitter:title', fullTitle)
+    upsertMeta('name', 'twitter:description', description)
+    upsertMeta('name', 'twitter:image', ogImage)
+
+    upsertLink('link[rel="canonical"]', { rel: 'canonical' }, canonical)
+    upsertLink(
+      'link[rel="alternate"][hreflang="en"]',
+      { rel: 'alternate', hreflang: 'en' },
+      canonical,
+    )
+    upsertLink(
+      'link[rel="preload"][as="image"]',
+      { rel: 'preload', as: 'image', fetchpriority: 'high' },
+      preloadHeroImage,
+    )
+  }, [canonical, description, fullTitle, ogImage, ogType, ogUrl, preloadHeroImage, twitterCard])
+
+  return null
 }
 
 export function RestaurantSchema() {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(RESTAURANT_SCHEMA) }}
-    />
-  )
+  useEffect(() => {
+    const selector = 'script[type="application/ld+json"][data-schema="restaurant"]'
+    const existing = document.head.querySelector(selector)
+    const script = existing ?? document.createElement('script')
+
+    script.setAttribute('type', 'application/ld+json')
+    script.setAttribute('data-schema', 'restaurant')
+    script.textContent = JSON.stringify(RESTAURANT_SCHEMA)
+
+    if (!existing) {
+      document.head.appendChild(script)
+    }
+
+    return () => {
+      script.remove()
+    }
+  }, [])
+
+  return null
 }

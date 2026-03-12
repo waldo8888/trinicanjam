@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -51,6 +51,7 @@ const restaurantSchema = {
 
 const routes = [
   {
+    routePath: '/',
     output: 'index.html',
     title: 'Trinicanjam Cuisine — Caribbean Soul, Hamilton Table',
     description:
@@ -64,6 +65,7 @@ const routes = [
     schema: restaurantSchema,
   },
   {
+    routePath: '/menu',
     output: 'menu.html',
     title: 'Menu',
     description:
@@ -74,6 +76,7 @@ const routes = [
     canonical: `${siteUrl}/menu`,
   },
   {
+    routePath: '/visit',
     output: 'visit.html',
     title: 'Visit',
     description:
@@ -84,6 +87,7 @@ const routes = [
     canonical: `${siteUrl}/visit`,
   },
   {
+    routePath: '/about',
     output: 'about.html',
     title: 'About — Trinicanjam Cuisine',
     description:
@@ -153,11 +157,7 @@ function buildHeadMarkup(route) {
 }
 
 function buildRootMarkup(route) {
-  if (!route.preloadHeroImage) {
-    return '<div id="root"></div>'
-  }
-
-  return `<div id="hero-shell" aria-hidden="true" style="position:fixed;inset:0;overflow:hidden;background:#0d0d0d;pointer-events:none;z-index:0"><img src="${escapeHtml(route.preloadHeroImage)}" alt="" width="1920" height="1080" fetchpriority="high" loading="eager" style="display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center" /><div aria-hidden="true" style="position:absolute;inset:0;background:rgba(13,13,13,0.42)"></div></div><div id="root"></div>`
+  return `<div id="root">${route.appHtml}</div>`
 }
 
 function injectMetadata(html, route) {
@@ -168,11 +168,22 @@ function injectMetadata(html, route) {
 }
 
 const baseHtml = await readFile(baseHtmlPath, 'utf8')
+const serverBundleDir = path.join(distDir, 'server')
+const serverEntry = (await readdir(serverBundleDir)).find(fileName => /entry-server\.(m?js)$/.test(fileName))
+
+if (!serverEntry) {
+  throw new Error('Unable to find the prerender server bundle in dist/server')
+}
+
+const { renderRoute } = await import(pathToFileURL(path.join(serverBundleDir, serverEntry)).href)
 
 await Promise.all(
   routes.map(async (route) => {
     const outputPath = path.join(distDir, route.output)
-    const html = injectMetadata(baseHtml, route)
+    const html = injectMetadata(baseHtml, {
+      ...route,
+      appHtml: renderRoute(route.routePath),
+    })
     await mkdir(path.dirname(outputPath), { recursive: true })
     await writeFile(outputPath, html)
   }),

@@ -40,6 +40,7 @@ jobs:
     needs: [test]
     outputs:
       preview-url: ${{ steps.deploy.outputs.preview-url }}
+      lighthouse-url: ${{ steps.deploy.outputs.lighthouse-url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -60,13 +61,20 @@ jobs:
         run: |
           PREVIEW_URL=$(npx vercel deploy --token="${{ secrets.VERCEL_TOKEN }}" --yes 2>&1 | grep -Eo 'https://[a-zA-Z0-9._-]+\.vercel\.app' | tail -1)
           echo "preview-url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          if [ -n "${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" ]; then
+            LIGHTHOUSE_URL="${PREVIEW_URL}?x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}"
+          else
+            LIGHTHOUSE_URL="$PREVIEW_URL"
+          fi
+          echo "lighthouse-url=$LIGHTHOUSE_URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to: $PREVIEW_URL"
+          echo "Lighthouse target: $LIGHTHOUSE_URL"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Run Lighthouse CI
-        run: npx lhci autorun --collect.url=${{ steps.deploy.outputs.preview-url }}
+        run: npx lhci autorun --collect.url=${{ steps.deploy.outputs.lighthouse-url }}
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

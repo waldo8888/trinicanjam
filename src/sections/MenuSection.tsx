@@ -1,136 +1,122 @@
-import { startTransition, useState, useEffect, useRef, type KeyboardEvent } from 'react'
-import { MENU_ITEMS, MENU_CATEGORIES } from '@/data/menu'
+import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { DishCard } from '@/components/DishCard/DishCard'
+import { MENU_ITEMS } from '@/data/menu'
 import { trackMenuView } from '@/lib/analytics'
 import styles from './MenuSection.module.css'
-import type { MenuCategory } from '@/types'
-
-function formatCategory(category: MenuCategory): string {
-  return category.charAt(0).toUpperCase() + category.slice(1)
-}
-
-function isIntentionalMenuView() {
-  if (typeof window === 'undefined') {
-    return false
-  }
-
-  return window.location.pathname === '/menu' || window.location.hash === '#menu'
-}
 
 export function MenuSection() {
-  const [activeCategory, setActiveCategory] = useState<MenuCategory>(MENU_CATEGORIES[0])
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
-  const hasTrackedView = useRef(false)
+  const categories = [
+    { id: 'starters', name: 'Starters' },
+    { id: 'mains', name: 'Mains' },
+    { id: 'sides', name: 'Sides' },
+    { id: 'drinks', name: 'Drinks' }
+  ]
+  const featuredItems = MENU_ITEMS.filter((item: any) => item.featured)
+  const [activeCategoryId, setActiveCategoryId] = useState(categories[0].id)
+  const tabListRef = useRef<HTMLDivElement>(null)
+  
+  const activeCategoryItems = MENU_ITEMS.filter((item: any) => item.category === activeCategoryId)
 
+  // Track viewing the menu once it's mounted
   useEffect(() => {
-    const maybeTrackMenuView = () => {
-      if (hasTrackedView.current || !isIntentionalMenuView()) {
-        return
-      }
-
-      hasTrackedView.current = true
-      trackMenuView()
-    }
-
-    maybeTrackMenuView()
-    window.addEventListener('hashchange', maybeTrackMenuView)
-
-    return () => {
-      window.removeEventListener('hashchange', maybeTrackMenuView)
-    }
+    trackMenuView()
   }, [])
 
-  const updateActiveCategory = (category: MenuCategory) => {
-    startTransition(() => {
-      setActiveCategory(category)
-    })
-  }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    if (!tabListRef.current) return
 
-  const setActiveTab = (category: MenuCategory) => {
-    updateActiveCategory(category)
-    tabRefs.current[category]?.focus()
-  }
+    const tabs = Array.from(tabListRef.current.querySelectorAll('button'))
+    let newIndex = index
 
-  const handleTabKeyDown = (category: MenuCategory) => (event: KeyboardEvent<HTMLButtonElement>) => {
-    const currentIndex = MENU_CATEGORIES.indexOf(category)
-
-    if (currentIndex === -1) {
-      return
-    }
-
-    let nextIndex = currentIndex
-
-    if (event.key === 'ArrowRight') {
-      nextIndex = (currentIndex + 1) % MENU_CATEGORIES.length
-    } else if (event.key === 'ArrowLeft') {
-      nextIndex = (currentIndex - 1 + MENU_CATEGORIES.length) % MENU_CATEGORIES.length
+    if (e.key === 'ArrowRight') {
+      newIndex = (index + 1) % tabs.length
+    } else if (e.key === 'ArrowLeft') {
+      newIndex = (index - 1 + tabs.length) % tabs.length
+    } else if (e.key === 'Home') {
+      newIndex = 0
+    } else if (e.key === 'End') {
+      newIndex = tabs.length - 1
     } else {
-      return
+      return // Unhandled key
     }
 
-    event.preventDefault()
-    setActiveTab(MENU_CATEGORIES[nextIndex])
+    e.preventDefault()
+    tabs[newIndex].focus()
+    setActiveCategoryId(categories[newIndex].id)
   }
-
-  const filteredItems = MENU_ITEMS
-    .filter(item => item.category === activeCategory)
-    .sort((a, b) => {
-      if (a.featured && !b.featured) return -1
-      if (!a.featured && b.featured) return 1
-      return 0
-    })
 
   return (
-    <section
-      id="menu"
-      aria-labelledby="menu-heading"
-      data-zone="warm"
-      className={styles.section}
-    >
-      <h2 id="menu-heading" className={styles.heading}>Our Menu</h2>
+    <section id="menu" aria-labelledby="menu-heading" className={styles.section}>
+      <div className={styles.container}>
+        <div className="luxury-text-reveal">
+          <h2 id="menu-heading" className={styles.heading}>
+            Signature Selection
+          </h2>
+        </div>
 
-      <div role="tablist" aria-label="Menu categories" className={styles.tabStrip}>
-        {MENU_CATEGORIES.map(category => (
-          <button
-            key={category}
-                id={`menu-tab-${category}`}
-            role="tab"
-            aria-selected={activeCategory === category}
-                aria-controls={`menu-panel-${category}`}
-                tabIndex={activeCategory === category ? 0 : -1}
-                ref={(element) => {
-                  tabRefs.current[category] = element
-                }}
-            className={[styles.tab, activeCategory === category ? styles.tabActive : ''].join(' ')}
-                onClick={() => updateActiveCategory(category)}
-                onKeyDown={handleTabKeyDown(category)}
-          >
-            {formatCategory(category)}
-          </button>
-        ))}
-      </div>
+        {/* Featured Items Grid (Premium Cards) */}
+        {featuredItems.length > 0 && (
+          <div className={styles.featuredGrid} aria-label="Featured Dishes">
+            {featuredItems.map((item: any) => (
+              <DishCard key={item.id} item={item} variant="featured" />
+            ))}
+          </div>
+        )}
 
-          <div
-            id={`menu-panel-${activeCategory}`}
-            role="tabpanel"
-            aria-labelledby={`menu-tab-${activeCategory}`}
-            className={styles.panel}
-          >
-            <div className={styles.grid}>
-              {filteredItems.map(item => (
-                <DishCard
-                  key={item.id}
-                  item={item}
-                  variant={item.featured ? 'featured' : 'compact'}
-                />
+        {/* Category Tabs (Glassmorphism Pills) */}
+        <div
+          ref={tabListRef}
+          role="tablist"
+          aria-label="Menu Categories"
+          className={styles.tabStrip}
+        >
+          {categories.map((category: any, index: number) => {
+            const isActive = activeCategoryId === category.id
+            return (
+              <button
+                key={category.id}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`panel-${category.id}`}
+                id={`tab-${category.id}`}
+                tabIndex={isActive ? 0 : -1}
+                className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
+                onClick={() => setActiveCategoryId(category.id)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+              >
+                {category.name}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Tab Panels */}
+        {categories.map((category: any) => {
+          const isActive = activeCategoryId === category.id
+          if (!isActive) return null
+
+          return (
+            <div
+              key={category.id}
+              id={`panel-${category.id}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${category.id}`}
+              tabIndex={0}
+              className={styles.tabPanel}
+            >
+              {activeCategoryItems.map((item: any) => (
+                <DishCard key={item.id} item={item} variant="compact" />
               ))}
             </div>
-      </div>
+          )
+        })}
 
-      <div className={styles.visitCta}>
-        <a href="/#visit" className={styles.visitCtaLink}>
-          Plan Your Visit →
-        </a>
+        <div className={styles.ctaContainer}>
+          <Link to="/visit" className={styles.ctaLink}>
+             Plan Your Visit
+          </Link>
+        </div>
       </div>
     </section>
   )

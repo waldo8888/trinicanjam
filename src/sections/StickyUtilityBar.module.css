@@ -1,120 +1,160 @@
-/* =================================================================
-   StickyUtilityBar — Scroll-triggered fixed navigation
-   All colors via data-zone="dark" token cascade — NO hardcoded hex.
-   ================================================================= */
-
-.bar {
+.utilityBar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 56px;
   z-index: var(--z-sticky);
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--space-6); /* 24px horizontal padding */
-    opacity: 0;
-    pointer-events: none;
-
-  transition-property: opacity;
-    transition-duration: 300ms;
-  transition-timing-function: ease-out;
-
-  /* Backdrop blur for legibility across all three tonal zones */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  /* color-mix uses the design token and applies 92% opacity for backdrop translucency.
-     Avoids hardcoded rgba() values per token architecture requirement (Task 2). */
-  background: color-mix(in srgb, var(--color-dark-900) 92%, transparent);
+  background: rgba(13, 13, 13, 0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.08);
+  transform: translateY(-100%);
+  transition: transform var(--duration-medium) var(--easing-spring),
+              opacity var(--duration-fast) var(--easing-default);
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .visible {
+  transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
 }
 
-.reducedMotion {
-  transition-duration: 0ms;
+.reducedMotion.utilityBar {
+  transition: opacity var(--duration-fast) var(--easing-default);
+  transform: none;
 }
 
-.wordmark {
-  font-family: var(--font-display);
-  font-size: var(--text-heading); /* 32px–48px fluid — per AC4 spec */
-  color: var(--color-brand-white);
-  letter-spacing: 0.02em;
-  user-select: none;
+.reducedMotion.visible {
+  opacity: 1;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.logomarkLink {
+  display: flex;
+  align-items: center;
+  transition: opacity var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.logomarkLink:hover {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.navLogo {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
 .actions {
   display: flex;
+  gap: var(--space-6);
   align-items: center;
-  gap: var(--space-3); /* 12px between CTAs */
 }
 
-/* Ghost CTA — "Menu" */
-.ctaGhost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  min-width: 72px;
-  padding: 0 var(--space-4); /* 16px horizontal */
-  border: 1px solid var(--color-brand-white);
+.ghostButton {
+  font-family: var(--font-ui);
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-cream-200);
+  text-decoration: none;
+  padding: var(--space-2) var(--space-4);
   background: transparent;
+  border-radius: 0;
+  transition: all var(--duration-fast) ease;
+  position: relative;
+}
+
+.ghostButton::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--color-brand-gold);
+  transition: width var(--duration-medium) var(--easing-luxury), left var(--duration-medium) var(--easing-luxury);
+}
+
+.ghostButton:hover {
   color: var(--color-brand-white);
+}
+
+.ghostButton:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+.primaryCTA {
   font-family: var(--font-ui);
-  font-size: var(--text-ui); /* 15px fixed */
-  font-weight: 500;
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-brand-white);
   text-decoration: none;
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-.ctaGhost:active {
-  transform: scale(0.96);
-  transition: transform 100ms ease;
-}
-
-.ctaGhost:focus-visible,
-.ctaCrimson:focus-visible {
-  border-radius: 2px;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-dark-900) 60%, transparent);
-}
-
-/* Filled crimson CTA — "Visit" */
-.ctaCrimson {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  min-width: 72px;
-  padding: 0 var(--space-4); /* 16px horizontal */
+  padding: var(--space-3) var(--space-6);
   background: var(--color-brand-crimson);
-  color: var(--color-brand-white);
-  font-family: var(--font-ui);
-  font-size: var(--text-ui); /* 15px fixed */
-  font-weight: 500;
-  text-decoration: none;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  cursor: pointer;
+  border-radius: 0;
+  transition: all var(--duration-fast) ease;
+  box-shadow: 0 4px 14px rgba(155, 35, 53, 0.4);
+  position: relative;
+  overflow: hidden;
 }
 
-.ctaCrimson:active {
-  transform: scale(0.96);
-  transition: transform 100ms ease;
+.primaryCTA::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-brand-gold);
+  transform: translateX(-101%);
+  transition: transform var(--duration-medium) var(--easing-luxury);
 }
 
-/* Mobile: reduce bar height to 52px */
-@media (max-width: 639px) {
-  .bar {
-    height: 52px;
-    padding: 0 var(--space-4); /* 16px on mobile */
+.primaryCTA:hover {
+  color: var(--color-brand-black);
+  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.4);
+  transform: translateY(-1px);
+}
+
+.primaryCTA:hover::before {
+  transform: translateX(0);
+}
+
+/* Keep text above pseudo */
+.primaryCTA {
+  position: relative;
+  z-index: 0;
+}
+
+@media (max-width: 640px) {
+  .navLogo {
+    height: 42px;
   }
-
-  .wordmark {
-    font-size: var(--text-body); /* slightly smaller wordmark on mobile */
+  
+  .ghostButton {
+    display: none;
+  }
+  
+  .primaryCTA {
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--text-micro);
   }
 }

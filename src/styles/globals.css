@@ -1,38 +1,15 @@
 /* =================================================================
-   TRINICANJAM CUISINE — Global Styles
-   Import order is critical: tokens MUST be first.
-   All @font-face declarations live here (not in tokens.css).
+   TRINICANJAM CUISINE — Global Styles (Premium Edition)
    ================================================================= */
 
-/* 1. Design tokens — MUST be first */
 @import './tokens.css';
 
-/* =================================================================
-   @FONT-FACE DECLARATIONS — Self-hosted WOFF2 variable fonts
-   Source: ARCH-16, NFR-P6, NFR-S2 (CSP font-src 'self')
-   font-display: optional chosen over swap to prevent CLS —
-   zero layout shift on first visit; instant on repeat visits
-   (Vercel CDN caches with Cache-Control: immutable in Story 1.3)
-   ================================================================= */
+@import './tokens.css';
 
-@font-face {
-  font-family: 'Cormorant Garamond';
-  src: url('/assets/fonts/cormorant-garamond-variable.woff2') format('woff2');
-  font-weight: 300 700; /* actual axis range: wght 300–700 (fonttools verified) */
-  font-style: normal;
-  font-display: optional;
-}
-
-@font-face {
-  font-family: 'DM Sans';
-  src: url('/assets/fonts/dm-sans-variable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: optional;
-}
+/* Fonts are loaded via Google Fonts in index.html for full character support */
 
 /* =================================================================
-   CSS RESET
+   CSS RESET & BASE
    ================================================================= */
 
 *,
@@ -43,13 +20,31 @@
   padding: 0;
 }
 
-/* =================================================================
-   BASE STYLES
-   ================================================================= */
-
 html {
-  font-size: 100%; /* rem base = 16px; never override this */
-  scroll-behavior: smooth;
+  font-size: 100%;
+  /* Lenis handles smooth scrolling, so we remove native CSS smooth scroll to avoid conflicts */
+  /* scroll-behavior: smooth; */
+}
+
+/* Lenis recommended base styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 body {
@@ -58,9 +53,11 @@ body {
   line-height: var(--leading-normal);
   color: var(--color-brand-black);
   background-color: var(--color-brand-white);
-  font-optical-sizing: auto; /* enable DM Sans opsz axis (9–40) */
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 img,
@@ -79,23 +76,51 @@ select {
   font: inherit;
 }
 
+/* Awwwards luxury focus state — no harsh outlines, elegant underline or subtle glow */
 :where(a, button, input, textarea, select, summary, [role='button'], [role='tab']):focus-visible {
-  outline: 2px solid var(--color-brand-crimson);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand-gold);
 }
 
 :where([data-zone='dark'], [data-zone='gradient'])
   :where(a, button, input, textarea, select, summary, [role='button'], [role='tab']):focus-visible {
-  outline-color: var(--color-brand-white);
+  box-shadow: 0 0 0 2px var(--color-brand-gold-light);
 }
 
 /* =================================================================
-   PREFERS-REDUCED-MOTION — Layer 1 (CSS Root Kill-Switch)
-   Part of the three-layer motion architecture (ARCH-10):
-     Layer 1: This block (global CSS override for all transitions/animations)
-     Layer 2: [data-zone] transition: none (in tokens.css above)
-     Layer 3: useReducedMotion hook + GSAP kill (Story 2.5)
-   Source: ux-design-specification.md, ARCH-10, NFR-A5, AODA requirement
+   UTILITY CLASSES
+   ================================================================= */
+
+.luxury-text-reveal {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(201, 168, 76, 0.25);
+  color: inherit;
+}
+
+/* Scrollbar styling for Webkit */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gold);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-gold-light);
+}
+
+/* =================================================================
+   PREFERS-REDUCED-MOTION
    ================================================================= */
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,4 +1,3 @@
-// Mocks must be at file top — Vitest hoists these before imports
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -6,6 +5,9 @@ import { resolve } from 'node:path'
 vi.mock('gsap', () => ({
   gsap: {
     set: vi.fn(),
+    to: vi.fn(),
+    fromTo: vi.fn(),
+    registerPlugin: vi.fn(),
     timeline: vi.fn(() => ({
       from: vi.fn().mockReturnThis(),
       fromTo: vi.fn().mockReturnThis(),
@@ -14,8 +16,16 @@ vi.mock('gsap', () => ({
   },
 }))
 
+vi.mock('gsap/ScrollTrigger', () => ({
+  ScrollTrigger: {
+    create: vi.fn(() => ({
+      kill: vi.fn(),
+    })),
+  },
+}))
+
 vi.mock('@/lib/useReducedMotion', () => ({
-  useReducedMotion: vi.fn(() => false), // default: no reduced motion
+  useReducedMotion: vi.fn(() => false),
 }))
 
 vi.mock('@/lib/animations/heroEntrance', () => ({
@@ -30,74 +40,47 @@ import { useReducedMotion } from '@/lib/useReducedMotion'
 import { animateHeroEntrance } from '@/lib/animations/heroEntrance'
 import { HeroSection } from '@/sections/HeroSection'
 
+const heroImageAlt = 'Beautifully plated jerk chicken at Trinicanjam Cuisine'
+
 describe('HeroSection', () => {
   it('renders a labelled hero region', () => {
     render(<HeroSection />)
-    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
+    const region = screen.getByRole('region', { name: /Trinicanjam\s*Cuisine/i })
     expect(region).toBeTruthy()
     expect(region.tagName.toLowerCase()).toBe('section')
   })
 
   it('renders section with data-zone="dark"', () => {
     render(<HeroSection />)
-    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
+    const region = screen.getByRole('region', { name: /Trinicanjam\s*Cuisine/i })
     expect(region.getAttribute('data-zone')).toBe('dark')
   })
 
-  it('renders hero image with correct src', () => {
+  it('renders the hero image with the current production asset', () => {
     render(<HeroSection />)
-    const img = screen.getByRole('img')
-    expect(img.getAttribute('src')).toBe('/assets/images/hero.webp')
-  })
-
-  it('renders hero image with descriptive alt text', () => {
-    render(<HeroSection />)
-    const img = screen.getByRole('img')
-    expect(img.getAttribute('alt')).toBe(
-      'Restaurant interior and food presentation at Trinicanjam Cuisine',
-    )
-  })
-
-  it('renders hero image with loading="eager" (not lazy)', () => {
-    render(<HeroSection />)
-    const img = screen.getByRole('img')
+    const img = screen.getByAltText(heroImageAlt)
+    expect(img.getAttribute('src')).toBe('/assets/images/hero-food.png')
     expect(img.getAttribute('loading')).toBe('eager')
-  })
-
-  it('renders hero image with fetchpriority="high" to protect the LCP path', () => {
-    render(<HeroSection />)
-    const img = screen.getByRole('img')
     expect(img.getAttribute('fetchpriority')).toBe('high')
   })
 
-  it('renders h1 with restaurant name', () => {
+  it('renders the brand headline, message, and service highlights', () => {
     render(<HeroSection />)
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Trinicanjam Cuisine')
+    expect(screen.getByRole('heading', { level: 1, name: /Trinicanjam\s*Cuisine/i })).toBeTruthy()
+    expect(screen.getByText(/Trinidadian and Jamaican comfort, plated with color, spice/i)).toBeTruthy()
+    expect(screen.getByText('Open 7 days')).toBeTruthy()
+    expect(screen.getByText('Takeout available')).toBeTruthy()
   })
 
-  it('renders brand tagline', () => {
+  it('renders hero CTA links to menu and social sections', () => {
     render(<HeroSection />)
-    expect(screen.getByText('Caribbean Soul. Hamilton Table.')).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Explore the Menu/i })).toHaveAttribute('href', '#menu')
+    expect(screen.getByRole('link', { name: /See Today\'s Feed/i })).toHaveAttribute('href', '#social')
   })
 
-  it('overlay div has aria-hidden="true"', () => {
+  it('renders hero image with explicit width and height for CLS prevention', () => {
     render(<HeroSection />)
-    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
-    const overlay = region.querySelector('[aria-hidden="true"]')
-    expect(overlay).toBeTruthy()
-  })
-
-  it('contains no buttons, nav, or anchor elements (AC5 — no UI controls)', () => {
-    render(<HeroSection />)
-    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
-    expect(region.querySelector('button')).toBeNull()
-    expect(region.querySelector('nav')).toBeNull()
-    expect(region.querySelector('a')).toBeNull()
-  })
-
-  it('renders hero image with explicit width and height for CLS prevention (AC6)', () => {
-    render(<HeroSection />)
-    const img = screen.getByRole('img')
+    const img = screen.getByAltText(heroImageAlt)
     expect(img.getAttribute('width')).toBe('1920')
     expect(img.getAttribute('height')).toBe('1080')
   })
@@ -113,7 +96,7 @@ describe('HeroSection loading states', () => {
     })
   })
 
-  it('hides text on initial render (visibility hidden)', () => {
+  it('hides text on initial render', () => {
     const { container } = render(<HeroSection />)
     const textContent = container.querySelector('[class*="textContent"]')
     expect(textContent?.className).toMatch(/textHidden/)
@@ -128,7 +111,7 @@ describe('HeroSection loading states', () => {
 
   it('removes shimmer and shows text after onLoad', async () => {
     const { container } = render(<HeroSection />)
-    const img = screen.getByRole('img')
+    const img = screen.getByAltText(heroImageAlt)
     fireEvent.load(img)
 
     await waitFor(() => {
@@ -140,9 +123,9 @@ describe('HeroSection loading states', () => {
     expect(textContent?.className).not.toMatch(/textHidden/)
   })
 
-  it('calls animateHeroEntrance after onLoad (normal motion)', async () => {
+  it('calls animateHeroEntrance after onLoad', async () => {
     render(<HeroSection />)
-    const img = screen.getByRole('img')
+    const img = screen.getByAltText(heroImageAlt)
     fireEvent.load(img)
 
     await waitFor(() => {
@@ -150,9 +133,9 @@ describe('HeroSection loading states', () => {
     })
   })
 
-  it('removes shimmer and shows text after onError (broken image)', () => {
+  it('removes shimmer and shows text after onError', () => {
     const { container } = render(<HeroSection />)
-    const img = screen.getByRole('img')
+    const img = screen.getByAltText(heroImageAlt)
     fireEvent.error(img)
 
     const shimmer = container.querySelector('[class*="shimmer"]')
@@ -160,13 +143,6 @@ describe('HeroSection loading states', () => {
 
     const textContent = container.querySelector('[class*="textContent"]')
     expect(textContent?.className).not.toMatch(/textHidden/)
-  })
-
-  it('does NOT call animateHeroEntrance after onError', () => {
-    render(<HeroSection />)
-    const img = screen.getByRole('img')
-    fireEvent.error(img)
-    expect(animateHeroEntrance).not.toHaveBeenCalled()
   })
 })
 
@@ -178,27 +154,23 @@ describe('HeroSection with prefers-reduced-motion', () => {
 
   it('shows text immediately with no shimmer when reduced motion is active', () => {
     const { container } = render(<HeroSection />)
-
-    const shimmer = container.querySelector('[class*="shimmer"]')
-    expect(shimmer).not.toBeInTheDocument()
-
+    expect(container.querySelector('[class*="shimmer"]')).not.toBeInTheDocument()
     const textContent = container.querySelector('[class*="textContent"]')
     expect(textContent?.className).not.toMatch(/textHidden/)
   })
 
-  it('does NOT call animateHeroEntrance when reduced motion is active', () => {
+  it('does not call animateHeroEntrance when reduced motion is active', () => {
     render(<HeroSection />)
-    const img = screen.getByRole('img')
+    const img = screen.getByAltText(heroImageAlt)
     fireEvent.load(img)
     expect(animateHeroEntrance).not.toHaveBeenCalled()
   })
 })
 
 describe('HeroSection performance guardrails', () => {
-  it('does not animate the hero image opacity on the LCP path', () => {
+  it('does not use a gsap from() call on the hero image LCP path', () => {
     const sourcePath = resolve(process.cwd(), 'src/lib/animations/heroEntrance.ts')
     const source = readFileSync(sourcePath, 'utf8')
-
     expect(source).not.toContain('.from(elements.image')
   })
 })

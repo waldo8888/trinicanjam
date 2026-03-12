@@ -51,7 +51,7 @@ describe('router', () => {
     renderAt('/')
 
     const preloadLink = document.head.querySelector('link[rel="preload"][as="image"]')
-    expect(preloadLink).toHaveAttribute('href', '/assets/images/hero.webp')
+    expect(preloadLink).toHaveAttribute('href', '/assets/images/hero-food.png')
     expect(preloadLink).toHaveAttribute('fetchpriority', 'high')
   })
 

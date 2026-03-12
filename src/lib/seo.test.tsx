@@ -62,13 +62,13 @@ describe('SEOHead', () => {
       <SEOHead
         title="Home"
         description="Trinicanjam home"
-        preloadHeroImage="/assets/images/hero.webp"
+        preloadHeroImage="/assets/images/hero-food.png"
       />,
     )
     const preloadLink = document.querySelector('link[rel="preload"]')
     expect(preloadLink).toBeTruthy()
     expect(preloadLink?.getAttribute('as')).toBe('image')
-    expect(preloadLink?.getAttribute('href')).toBe('/assets/images/hero.webp')
+    expect(preloadLink?.getAttribute('href')).toBe('/assets/images/hero-food.png')
     expect(preloadLink?.getAttribute('fetchpriority')).toBe('high')
   })
 
@@ -215,11 +215,20 @@ describe('RestaurantSchema', () => {
     expect(parsed.name.length).toBeGreaterThan(0)
   })
 
-  it('openingHoursSpecification is an array with at least one entry', () => {
+  it('schema includes the current phone and address details', () => {
     render(<RestaurantSchema />)
     const script = document.querySelector('script[type="application/ld+json"]')
     const parsed = JSON.parse(script?.textContent ?? '{}')
-    expect(Array.isArray(parsed.openingHoursSpecification)).toBe(true)
-    expect(parsed.openingHoursSpecification.length).toBeGreaterThanOrEqual(1)
+    expect(parsed.telephone).toBe('+19055240004')
+    expect(parsed.address?.streetAddress).toBe('355 Main St E')
+    expect(parsed.address?.postalCode).toBe('L8N 1J4')
+  })
+
+  it('schema includes social profile links in sameAs', () => {
+    render(<RestaurantSchema />)
+    const script = document.querySelector('script[type="application/ld+json"]')
+    const parsed = JSON.parse(script?.textContent ?? '{}')
+    expect(parsed.sameAs).toContain('https://www.instagram.com/trinicanjamcuisine/')
+    expect(parsed.sameAs).toContain('https://www.facebook.com/profile.php/?id=61561158214261')
   })
 })

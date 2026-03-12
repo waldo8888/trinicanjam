@@ -5,6 +5,8 @@ export interface MenuItem {
   price: string // e.g. "$18.00" — string for formatting flexibility
   category: MenuCategory
   imageSrc?: string // relative path or vite-imagetools import result
+  image?: string
+  imageAlt?: string
   featured?: boolean // drives DishCard featured variant (Epic 3 Story 3.4)
 }
 

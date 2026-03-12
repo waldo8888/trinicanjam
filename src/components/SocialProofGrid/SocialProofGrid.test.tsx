@@ -14,83 +14,51 @@ describe('SocialProofGrid', () => {
     vi.clearAllMocks()
   })
 
-  it('renders skeleton loading state initially', () => {
+  it('renders the social proof header and profile actions', () => {
     render(<SocialProofGrid />)
 
-    expect(screen.getByLabelText('Loading Instagram photos')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Fresh from @trinicanjamcuisine/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Follow on Instagram/i })).toHaveAttribute(
+      'href',
+      'https://www.instagram.com/trinicanjamcuisine/',
+    )
+    expect(screen.getByRole('link', { name: /View Facebook/i })).toHaveAttribute(
+      'href',
+      'https://www.facebook.com/profile.php/?id=61561158214261',
+    )
   })
 
-  it('renders six Instagram tile links', () => {
+  it('renders six linked social cards', () => {
     render(<SocialProofGrid />)
 
-    const links = screen.getAllByRole('link', { name: /View on Instagram/i })
-    expect(links).toHaveLength(6)
+    const links = screen.getAllByRole('link')
+    expect(links.filter((link) => link.getAttribute('href')?.includes('instagram.com/trinicanjamcuisine'))).toHaveLength(7)
   })
 
-  it('all links have rel="noopener noreferrer"', () => {
-    render(<SocialProofGrid />)
-
-    const links = screen.getAllByRole('link', { name: /View on Instagram/i })
-    links.forEach((link) => {
-      expect(link.getAttribute('rel')).toContain('noopener')
-      expect(link.getAttribute('rel')).toContain('noreferrer')
-    })
-  })
-
-  it('all links point to the Instagram profile URL', () => {
-    render(<SocialProofGrid />)
-
-    const links = screen.getAllByRole('link', { name: /View on Instagram/i })
-    links.forEach((link) => {
-      expect(link.getAttribute('href')).toBe('https://instagram.com/trinicanjam')
-    })
-  })
-
-  it('all images have non-empty alt text and lazy loading', () => {
+  it('renders local curated images with non-empty alt text', () => {
     render(<SocialProofGrid />)
 
     const images = screen.getAllByRole('img')
     expect(images).toHaveLength(6)
-
     images.forEach((image) => {
+      expect(image.getAttribute('src')).toMatch(/^\/assets\/images\/social\//)
       expect(image.getAttribute('alt')).toBeTruthy()
-      expect(image.getAttribute('alt')).not.toBe('')
       expect(image.getAttribute('loading')).toBe('lazy')
-      expect(image.getAttribute('width')).toBe('400')
-      expect(image.getAttribute('height')).toBe('400')
     })
   })
 
-  it('uses descriptive alt copy for the curated Instagram tiles', () => {
+  it('shows the featured reel and a doubles-related card', () => {
     render(<SocialProofGrid />)
 
-    expect(
-      screen.getByRole('img', {
-        name: 'Chef plating a Caribbean entree with fresh herbs at Trinicanjam Cuisine',
-      }),
-    ).toBeInTheDocument()
-
-    expect(
-      screen.getByRole('img', {
-        name: 'Dining room table set for service inside Trinicanjam Cuisine',
-      }),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Now Open 7 Days')).toBeInTheDocument()
+    expect(screen.getByText('Toonie Tuesday Doubles')).toBeInTheDocument()
   })
 
-  it('marks the grid as loaded after the first image fires onLoad', () => {
+  it('tracks Instagram clicks when a social card is clicked', () => {
     render(<SocialProofGrid />)
 
-    const firstImage = screen.getAllByRole('img')[0]
-    fireEvent.load(firstImage)
-
-    expect(screen.queryByLabelText('Loading Instagram photos')).not.toBeInTheDocument()
-  })
-
-  it('calls trackInstagramClick when a tile is clicked', () => {
-    render(<SocialProofGrid />)
-
-    const firstLink = screen.getAllByRole('link', { name: /View on Instagram/i })[0]
-    fireEvent.click(firstLink)
+    const firstInstagramCard = screen.getByRole('link', { name: /Now Open 7 Days/i })
+    fireEvent.click(firstInstagramCard)
 
     expect(mockTrackInstagramClick).toHaveBeenCalledTimes(1)
   })

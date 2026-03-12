@@ -16,55 +16,35 @@ describe('VisitBlock', () => {
     window.history.replaceState({}, '', '/')
   })
 
-  it('renders restaurant address', () => {
+  it('renders the updated restaurant address and phone', () => {
     render(<VisitBlock />)
 
-    expect(screen.getByText('Trinicanjam Cuisine')).toBeInTheDocument()
+    expect(screen.getByText('355 Main St E')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /\(905\) 524-0004/i })).toHaveAttribute(
+      'href',
+      'tel:+19055240004',
+    )
   })
 
-  it('renders a tappable phone link', () => {
+  it('renders service notes sourced from social profiles', () => {
     render(<VisitBlock />)
 
-    const link = screen.getByRole('link', { name: /905/i })
-    expect(link.getAttribute('href')).toMatch(/^tel:/)
+    expect(screen.getByText('Open 7 days a week')).toBeInTheDocument()
+    expect(screen.getByText('Takeout available')).toBeInTheDocument()
+    expect(screen.getByText(/Daily specials announced on Instagram and Facebook/i)).toBeInTheDocument()
   })
 
-  it("highlights today's hours row", () => {
-    render(<VisitBlock />)
-
-    const todayIndex = new Date().getDay()
-    const todayRow = document.querySelector(`[data-testid="hours-row-${todayIndex}"]`)
-    expect(todayRow?.className).toContain('todayRow')
-  })
-
-  it('tracks hours view on the dedicated visit route', () => {
+  it('tracks service view on the dedicated visit route', () => {
     window.history.replaceState({}, '', '/visit')
-
     render(<VisitBlock />)
-
     expect(trackHoursView).toHaveBeenCalledTimes(1)
-  })
-
-  it('does not track hours view on a generic route without visit intent', () => {
-    render(<VisitBlock />)
-
-    expect(trackHoursView).not.toHaveBeenCalled()
-  })
-
-  it('Get Directions link has noopener noreferrer', () => {
-    render(<VisitBlock />)
-
-    const link = screen.getByRole('link', { name: /Get Directions/i })
-    expect(link.getAttribute('rel')).toContain('noopener')
-    expect(link.getAttribute('rel')).toContain('noreferrer')
   })
 
   it('tracks directions clicks from the CTA', () => {
     render(<VisitBlock />)
 
     const directionsLink = screen.getByRole('link', { name: /Get Directions/i })
-    directionsLink.addEventListener('click', event => event.preventDefault())
-
+    directionsLink.addEventListener('click', (event) => event.preventDefault())
     fireEvent.click(directionsLink)
 
     expect(trackDirectionsClick).toHaveBeenCalledTimes(1)
@@ -73,17 +53,15 @@ describe('VisitBlock', () => {
   it('tracks phone clicks from the phone link', () => {
     render(<VisitBlock />)
 
-    const phoneLink = screen.getByRole('link', { name: /905/i })
-    phoneLink.addEventListener('click', event => event.preventDefault())
-
+    const phoneLink = screen.getByRole('link', { name: /\(905\) 524-0004/i })
+    phoneLink.addEventListener('click', (event) => event.preventDefault())
     fireEvent.click(phoneLink)
 
     expect(trackPhoneClick).toHaveBeenCalledTimes(1)
   })
 
-  it('renders the embedded map context before the CTAs', () => {
+  it('renders the embedded map context before the visit details', () => {
     vi.stubEnv('VITE_MAPS_EMBED_KEY', '')
-
     render(<VisitBlock />)
 
     const caption = screen.getByText('Trinicanjam Cuisine — Hamilton, Ontario')

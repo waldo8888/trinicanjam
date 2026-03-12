@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import type { MenuItem } from '@/types'
 import styles from './DishCard.module.css'
 
@@ -6,38 +7,45 @@ interface DishCardProps {
   variant?: 'compact' | 'featured'
 }
 
-export function DishCard({ item, variant = 'compact' }: DishCardProps) {
-  const isFeatured = variant === 'featured'
+export const DishCard = forwardRef<HTMLDivElement, DishCardProps>(
+  ({ item, variant = 'compact' }, ref) => {
+    const isFeatured = variant === 'featured'
 
-  return (
-    <article
-      className={[styles.card, isFeatured ? styles.cardFeatured : ''].join(' ').trim()}
-      data-variant={variant}
-    >
-      {item.imageSrc ? (
-        <img
-          src={item.imageSrc}
-          alt=""
-          width={isFeatured ? 800 : 400}
-          height={isFeatured ? 450 : 300}
-          loading="lazy"
-          className={styles.image}
-        />
-      ) : (
-        <div
-          className={isFeatured ? styles.imagePlaceholderFeatured : styles.imagePlaceholder}
-          aria-hidden="true"
-        />
-      )}
-      <div className={styles.body}>
-        <h3 className={[styles.name, isFeatured ? styles.nameFeatured : ''].join(' ').trim()}>
-          {item.name}
-        </h3>
-        <span className={styles.price}>{item.price}</span>
-        <p className={[styles.description, isFeatured ? styles.descriptionFeatured : ''].join(' ').trim()}>
-          {item.description}
-        </p>
-      </div>
-    </article>
-  )
-}
+    return (
+      <article
+        ref={ref}
+        className={`${styles.card} ${isFeatured ? styles.featuredCard : ''}`}
+      >
+        {isFeatured && (
+          <div className={styles.imageContainer}>
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.name}
+                className={styles.image}
+                loading="lazy"
+              />
+            ) : (
+              <div className={styles.placeholder} aria-hidden="true">
+                <span className={styles.placeholderIcon}>🍽️</span>
+              </div>
+            )}
+            <div className={styles.featuredBadge}>Signature</div>
+          </div>
+        )}
+
+        <div className={styles.body}>
+          <div className={styles.headerRow}>
+            <h3 className={styles.name}>{item.name}</h3>
+            <span className={styles.price}>${item.price}</span>
+          </div>
+          {item.description && (
+            <p className={styles.description}>{item.description}</p>
+          )}
+        </div>
+      </article>
+    )
+  }
+)
+
+DishCard.displayName = 'DishCard'

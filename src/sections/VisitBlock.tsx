@@ -1,124 +1,174 @@
 import { useEffect, useRef } from 'react'
 import { MapEmbed } from '@/components/MapEmbed/MapEmbed'
 import { SocialProofGrid } from '@/components/SocialProofGrid/SocialProofGrid'
+import { useReducedMotion } from '@/lib/useReducedMotion'
+import { businessInfo } from '@/data/siteContent'
 import { trackDirectionsClick, trackHoursView, trackPhoneClick } from '@/lib/analytics'
 import styles from './VisitBlock.module.css'
 
-interface HoursRow {
-  day: string
-  dayIndex: number
-  hours: string
-}
-
-const OPENING_HOURS: HoursRow[] = [
-  { day: 'Tuesday', dayIndex: 2, hours: '11:00 AM - 9:00 PM' },
-  { day: 'Wednesday', dayIndex: 3, hours: '11:00 AM - 9:00 PM' },
-  { day: 'Thursday', dayIndex: 4, hours: '11:00 AM - 9:00 PM' },
-  { day: 'Friday', dayIndex: 5, hours: '11:00 AM - 10:00 PM' },
-  { day: 'Saturday', dayIndex: 6, hours: '11:00 AM - 10:00 PM' },
-  { day: 'Sunday', dayIndex: 0, hours: '12:00 PM - 8:00 PM' },
-  { day: 'Monday', dayIndex: 1, hours: 'Closed' },
-]
-
-function isIntentionalVisitView() {
-  if (typeof window === 'undefined') {
-    return false
-  }
-
-  return window.location.pathname === '/visit' || window.location.hash === '#visit'
-}
-
 export function VisitBlock() {
-  const todayIndex = new Date().getDay()
-  const hasTrackedView = useRef(false)
+  const sectionRef = useRef<HTMLElement>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
-    const maybeTrackHoursView = () => {
-      if (hasTrackedView.current || !isIntentionalVisitView()) {
-        return
-      }
+    if (prefersReducedMotion || !sectionRef.current) return
 
-      hasTrackedView.current = true
-      trackHoursView()
+    let ctx: any
+    const setupAnimations = async () => {
+      const { gsap } = await import('gsap')
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const element = sectionRef.current
+      if (!element) return
+
+      ctx = gsap.context(() => {
+        // Glass card reveal
+        gsap.fromTo(element.querySelector(`.${styles.contactCard}`),
+          { y: 60, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: element.querySelector(`.${styles.splitLayout}`),
+              start: 'top 80%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        )
+
+        // Staggered info group reveal
+        const infoGroups = element.querySelectorAll(`.${styles.infoGroup}`)
+        if (infoGroups.length) {
+          gsap.fromTo(infoGroups,
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 1,
+              stagger: 0.15,
+              ease: 'power2.out',
+              delay: 0.3,
+              scrollTrigger: {
+                trigger: element.querySelector(`.${styles.splitLayout}`),
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+              }
+            }
+          )
+        }
+
+        // Parallax for map to give it luxury movement
+        gsap.fromTo(element.querySelector(`.${styles.mapWrapper}`),
+          { yPercent: 5 },
+          {
+            yPercent: -5,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: element.querySelector(`.${styles.splitLayout}`),
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.5,
+            }
+          }
+        )
+      }, element)
     }
 
-    maybeTrackHoursView()
-    window.addEventListener('hashchange', maybeTrackHoursView)
+    void setupAnimations()
 
     return () => {
-      window.removeEventListener('hashchange', maybeTrackHoursView)
+      if (ctx) ctx.revert()
+    }
+  }, [prefersReducedMotion])
+
+  useEffect(() => {
+    if (window.location.pathname === '/visit') {
+      trackHoursView()
     }
   }, [])
 
   return (
-    <section id="visit" aria-labelledby="visit-heading" className={styles.section}>
-      <h2 id="visit-heading" className={styles.heading}>Find Us</h2>
-
-      <div className={styles.content}>
-        <address className={styles.address}>
-          <strong>Trinicanjam Cuisine</strong>
-          <br />
-          123 King Street East
-          <br />
-          Hamilton, ON L8N 1A1
-          <br />
-          <span className={styles.neighbourhood}>Lower City, Hamilton</span>
-        </address>
-
-        <table className={styles.hoursTable}>
-          <thead>
-            <tr>
-              <th scope="col">Day</th>
-              <th scope="col">Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {OPENING_HOURS.map(({ day, dayIndex, hours }) => {
-              const isToday = dayIndex === todayIndex
-
-              return (
-                <tr
-                  key={day}
-                  data-testid={`hours-row-${dayIndex}`}
-                  className={isToday ? styles.todayRow : undefined}
-                >
-                  <td>{day}</td>
-                  <td>{hours}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-
-        <p className={styles.phone}>
-          Call us:{' '}
-          <a
-            href="tel:+19055551234"
-            className={styles.phoneLink}
-            onClick={trackPhoneClick}
-          >
-            (905) 555-1234
-          </a>
-        </p>
-
-        <MapEmbed />
-
-        <SocialProofGrid />
-
-        <div className={styles.ctas}>
-          <a
-            href="https://maps.google.com/?q=Trinicanjam+Cuisine+Hamilton+Ontario"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.ctaPrimary}
-            onClick={trackDirectionsClick}
-          >
-            Get Directions
-          </a>
-          <a href="/#menu" className={styles.ctaOutlined}>
-            View Menu
-          </a>
+    <section id="visit" ref={sectionRef} aria-labelledby="visit-heading" className={styles.section}>
+      <div className={styles.container}>
+        
+        {/* Centered heading */}
+        <div className={styles.sectionHeader}>
+          <p className={styles.eyebrow}>Find Us</p>
+          <div className="luxury-text-reveal">
+            <h2 id="visit-heading" className={styles.heading}>
+              Dine With Us
+            </h2>
+          </div>
+          <div className={styles.ornamentDivider} aria-hidden="true">
+            <span className={styles.ornamentLine} />
+            <span className={styles.ornamentDiamond} />
+            <span className={styles.ornamentLine} />
+          </div>
         </div>
+
+        <div className={styles.splitLayout}>
+          {/* Map Side */}
+          <div className={styles.mapSide}>
+            <div className={styles.mapWrapper}>
+               <MapEmbed location={businessInfo.mapQuery} />
+            </div>
+          </div>
+          
+          {/* Contact Card Side */}
+          <div className={styles.contactSide}>
+            <div className={styles.contactCard}>
+              
+              <div className={styles.infoGroup}>
+                <h3 className={styles.subheading}>Location</h3>
+                <address className={styles.address}>
+                  {businessInfo.addressLines.map((line) => (
+                    <span key={line}>
+                      {line}
+                      <br />
+                    </span>
+                  ))}
+                </address>
+                <a 
+                  href={businessInfo.directionsHref}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.textLink}
+                  onClick={trackDirectionsClick}
+                >
+                  Get Directions →
+                </a>
+              </div>
+
+              <div className={styles.infoGroup}>
+                <h3 className={styles.subheading}>Contact</h3>
+                <a 
+                  href={businessInfo.phoneHref}
+                  className={styles.phoneLink}
+                  onClick={trackPhoneClick}
+                >
+                  {businessInfo.phoneDisplay}
+                </a>
+              </div>
+
+              <div className={styles.infoGroup}>
+                <h3 className={styles.subheading}>Hours</h3>
+                <ul className={styles.serviceList}>
+                  {businessInfo.serviceNotes.map((note) => (
+                    <li key={note} className={styles.serviceItem}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.socialProofSection}>
+           <SocialProofGrid />
+        </div>
+        
       </div>
     </section>
   )

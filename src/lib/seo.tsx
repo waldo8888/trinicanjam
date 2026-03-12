@@ -1,45 +1,26 @@
 import { useEffect } from 'react'
+import { businessInfo } from '@/data/siteContent'
 
 export const SITE_URL = 'https://trinicanjam.ca'
 
-// Restaurant JSON-LD schema — all fields are placeholder values marked TODO where real data is needed
 const RESTAURANT_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'Restaurant',
-  name: 'Trinicanjam Cuisine',                            // TODO: confirm legal name
+  name: businessInfo.name,
   url: SITE_URL,
-  telephone: '+19055551234',                              // TODO: replace with real phone
+  telephone: '+19055240004',
   servesCuisine: ['Caribbean', 'Trinidadian', 'Jamaican'],
   priceRange: '$$',
   image: `${SITE_URL}/assets/og-image.jpg`,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '123 King Street East',                // TODO: replace with real address
+    streetAddress: '355 Main St E',
     addressLocality: 'Hamilton',
     addressRegion: 'ON',
-    postalCode: 'L8N 1A1',                                // TODO: replace with real postal code
+    postalCode: 'L8N 1J4',
     addressCountry: 'CA',
   },
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday'],
-      opens: '11:00',
-      closes: '21:00',
-    },
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Friday', 'Saturday'],
-      opens: '11:00',
-      closes: '22:00',
-    },
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Sunday'],
-      opens: '12:00',
-      closes: '20:00',
-    },
-  ],
+  sameAs: [businessInfo.instagramUrl, businessInfo.facebookUrl],
 } as const
 
 interface SEOHeadProps {

@@ -1,112 +1,199 @@
 .section {
-  padding: var(--space-12) var(--space-6);
-  background: var(--color-cream-100);
+  padding: var(--section-pad-y) var(--section-pad-x);
+  transition: background-color var(--zone-transition-duration) var(--zone-transition-easing);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .heading {
   font-family: var(--font-display);
   font-size: var(--text-display);
-  font-weight: 400;
-  color: var(--color-brand-black);
+  line-height: var(--leading-tight);
+  color: inherit;
+  margin: 0 0 var(--space-4) 0;
   text-align: center;
-  margin-bottom: var(--space-8);
+  font-weight: 300;
 }
 
+/* Gold ornamental sub-heading */
+.heading::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  background: var(--color-brand-crimson);
+  margin: var(--space-4) auto var(--space-8);
+}
+
+[data-zone="dark"] .heading::after,
+[data-zone="gradient"] .heading::after {
+  background: var(--color-brand-gold);
+}
+
+/* Glassmorphism Tab Strip */
 .tabStrip {
   display: flex;
   gap: var(--space-2);
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: var(--space-4);
-  margin-bottom: var(--space-8);
-  border-bottom: 1px solid var(--color-cream-200);
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: var(--space-2);
+  background: var(--color-brand-white);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-10);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-inline: auto;
+  min-width: min-content;
 }
 
-.tabStrip::-webkit-scrollbar {
-  display: none;
+[data-zone="dark"] .tabStrip {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+[data-zone="gradient"] .tabStrip {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
 }
 
 .tab {
-  font-family: var(--font-ui);
-  font-size: var(--text-ui);
-  font-weight: 500;
-  color: var(--color-brand-black);
-  background: none;
+  padding: var(--space-3) var(--space-6);
   border: none;
-  border-bottom: 2px solid transparent;
-  padding: var(--space-3) var(--space-4);
-  min-height: 44px;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-dark-600);
   cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast) var(--easing-default);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
   white-space: nowrap;
-  transition: border-bottom-color var(--duration-fast) var(--easing-default),
-              color var(--duration-fast) var(--easing-default);
+}
+
+@media (min-width: 768px) {
+  .tab {
+    padding: var(--space-3) var(--space-8);
+    font-size: var(--text-ui);
+  }
+}
+
+[data-zone="dark"] .tab,
+[data-zone="gradient"] .tab {
+  color: var(--color-cream-300);
 }
 
 .tab:hover {
-  border-bottom-color: var(--color-brand-gold);
-}
-
-.tabActive {
-  border-bottom-color: var(--color-brand-crimson);
   color: var(--color-brand-crimson);
-  font-weight: 600;
 }
 
-.tab:focus-visible {
-  border-radius: 2px;
+[data-zone="dark"] .tab:hover,
+[data-zone="gradient"] .tab:hover {
+  color: var(--color-brand-gold);
 }
 
-.panel {
-  outline: none;
+.activeTab {
+  background: var(--color-brand-crimson);
+  color: var(--color-brand-white) !important;
+  box-shadow: var(--shadow-md);
 }
 
-.grid {
+[data-zone="dark"] .activeTab,
+[data-zone="gradient"] .activeTab {
+  background: var(--color-brand-gold);
+  color: var(--color-brand-black) !important;
+  box-shadow: var(--shadow-glow-gold);
+}
+
+.tabPanel {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-4);
+  gap: var(--space-8);
 }
 
-.visitCta {
-  text-align: center;
-  padding-block-start: var(--space-8);
+@media (min-width: 768px) {
+  .tabPanel {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-12);
+  }
 }
 
-.visitCtaLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding-inline: var(--space-3);
-  font-family: var(--font-ui);
-  font-size: var(--text-body);
-  color: var(--color-brand-crimson);
-  text-decoration: none;
-  letter-spacing: 0.05em;
+.featuredGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-16);
 }
 
-.visitCtaLink:hover {
-  text-decoration: underline;
-}
-
-.visitCtaLink:focus-visible {
-  border-radius: 2px;
-}
-
-@media (min-width: 640px) {
-  .grid {
+@media (min-width: 1024px) {
+  .featuredGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.ctaContainer {
+  margin-top: var(--space-16);
+  display: flex;
+  justify-content: center;
 }
 
-/* Featured cards span 2 columns in the multi-col grid */
-@media (min-width: 640px) {
-  .grid [data-variant="featured"] {
-    grid-column: span 2;
-  }
+.ctaLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4) var(--space-10);
+  background: transparent;
+  color: currentColor;
+  border: 1px solid currentColor;
+  text-decoration: none;
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  transition: all var(--duration-medium) var(--easing-default);
+  overflow: hidden;
+  z-index: 1; /* Keep text above pseudo-element */
+}
+
+/* Premium fill hover effect */
+.ctaLink::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-brand-crimson);
+  transform: translateY(101%); /* 101% prevents subpixel rendering leaks */
+  transition: transform var(--duration-medium) var(--easing-luxury);
+  z-index: -1;
+}
+
+[data-zone="dark"] .ctaLink::before,
+[data-zone="gradient"] .ctaLink::before {
+  background: var(--color-brand-gold);
+}
+
+.ctaLink:hover {
+  color: var(--color-brand-white);
+  border-color: transparent;
+}
+
+[data-zone="dark"] .ctaLink:hover,
+[data-zone="gradient"] .ctaLink:hover {
+  color: var(--color-brand-black);
+}
+
+.ctaLink:hover::before {
+  transform: translateY(0);
 }

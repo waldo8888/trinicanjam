@@ -1,4 +1,5 @@
 import { renderToString } from 'react-dom/server'
+import { StaticRouter } from 'react-router-dom/server'
 import { SkipLink } from '@/components/SkipLink/SkipLink'
 import { TonalZoneProvider } from '@/context/TonalZoneContext'
 import { AboutPage } from '@/pages/AboutPage'
@@ -13,11 +14,13 @@ export function renderRoute(routePath: string): string {
   }[routePath] ?? NotFoundPage
 
   return renderToString(
-    <TonalZoneProvider>
-      <>
-        <SkipLink />
-        <PageComponent />
-      </>
-    </TonalZoneProvider>,
+    <StaticRouter location={routePath}>
+      <TonalZoneProvider>
+        <>
+          <SkipLink />
+          <PageComponent />
+        </>
+      </TonalZoneProvider>
+    </StaticRouter>
   )
 }

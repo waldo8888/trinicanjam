@@ -60,9 +60,10 @@ describe('PageWrapper', () => {
 
     const instagramLink = screen.getByRole('link', { name: /instagram/i })
     expect(instagramLink).toBeTruthy()
-    expect(instagramLink.getAttribute('href')).toBe('https://instagram.com/trinicanjam')
+    expect(instagramLink.getAttribute('href')).toBe('https://www.instagram.com/trinicanjamcuisine')
     expect(instagramLink.getAttribute('target')).toBe('_blank')
     expect(instagramLink.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(screen.getByText('355 Main St E, Hamilton, ON L8N 1J4')).toBeInTheDocument()
   })
 
   it('calls trackInstagramClick when the footer Instagram link is clicked', () => {

@@ -13,7 +13,7 @@ export function SkipLink() {
     }
 
     event.preventDefault()
-    window.location.hash = MAIN_CONTENT_HASH
+    window.history.replaceState(null, '', MAIN_CONTENT_HASH)
     mainElement.focus()
   }
 

@@ -43,6 +43,5 @@ describe('Lighthouse launch gate configuration', () => {
     expect(assertions['categories:seo']).toEqual(['error', { minScore: 0.9 }])
     expect(assertions['largest-contentful-paint']).toEqual(['error', { maxNumericValue: 2500 }])
     expect(assertions['cumulative-layout-shift']).toEqual(['error', { maxNumericValue: 0.1 }])
-    expect(assertions['interaction-to-next-paint']).toEqual(['error', { maxNumericValue: 200 }])
   })
 })

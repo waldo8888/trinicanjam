@@ -1,5 +1,8 @@
 {
   "rewrites": [
+    { "source": "/menu", "destination": "/menu.html" },
+    { "source": "/visit", "destination": "/visit.html" },
+    { "source": "/about", "destination": "/about.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

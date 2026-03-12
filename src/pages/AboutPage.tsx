@@ -1,14 +1,20 @@
 import { SEOHead, SITE_URL } from '@/lib/seo'
+import { MAIN_CONTENT_ID } from '@/components/SkipLink/SkipLink'
 import { BrandStorySection } from '@/sections/BrandStorySection'
 import styles from './AboutPage.module.css'
 
+const ABOUT_OG_IMAGE = `${SITE_URL}/assets/og-image.jpg`
+const ABOUT_URL = `${SITE_URL}/about`
+
 export function AboutPage() {
   return (
-    <main id="main-content">
+    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
       <SEOHead
         title="About — Trinicanjam Cuisine"
         description="The story behind Trinicanjam Cuisine — Caribbean culinary roots, Hamilton Ontario, and a table for everyone."
-        canonical={`${SITE_URL}/about`}
+        ogImage={ABOUT_OG_IMAGE}
+        ogUrl={ABOUT_URL}
+        canonical={ABOUT_URL}
         noSuffix
       />
       <header data-zone="dark" className={styles.miniHero}>
@@ -41,7 +47,9 @@ export function AboutPage() {
         </p>
       </section>
 
-      <BrandStorySection />
+      <div data-zone="warm" className={styles.brandStoryZone}>
+        <BrandStorySection />
+      </div>
 
       <section data-zone="warm" className={styles.ctaSection}>
         <h2 className={styles.sectionHeading}>Come to the Table</h2>

@@ -1,5 +1,12 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+
+vi.mock('@/lib/analytics', () => ({
+  trackInstagramClick: vi.fn(),
+}))
+
+import { trackInstagramClick } from '@/lib/analytics'
+import { MAIN_CONTENT_ID } from '@/components/SkipLink/SkipLink'
 import { PageWrapper } from '@/sections/PageWrapper'
 import { TonalZoneProvider } from '@/context/TonalZoneContext'
 
@@ -8,6 +15,17 @@ function renderWithProvider(ui: React.ReactElement) {
 }
 
 describe('PageWrapper', () => {
+  it('renders a focusable main landmark around the three content zones', () => {
+    renderWithProvider(<PageWrapper />)
+
+    const main = document.querySelector(`main#${MAIN_CONTENT_ID}`)
+    expect(main).toBeTruthy()
+    expect(main?.getAttribute('tabindex')).toBe('-1')
+    expect(main?.querySelector('[data-zone="dark"]')).toBeTruthy()
+    expect(main?.querySelector('[data-zone="warm"]')).toBeTruthy()
+    expect(main?.querySelector('section[data-zone="gradient"]')).toBeTruthy()
+  })
+
   it('renders three zone sections with correct data-zone attributes', () => {
     renderWithProvider(<PageWrapper />)
     expect(document.querySelector('[data-zone="dark"]')).toBeTruthy()
@@ -42,9 +60,18 @@ describe('PageWrapper', () => {
 
     const instagramLink = screen.getByRole('link', { name: /instagram/i })
     expect(instagramLink).toBeTruthy()
-    expect(instagramLink.getAttribute('href')).toBe('https://www.instagram.com/trinicanjam')
+    expect(instagramLink.getAttribute('href')).toBe('https://instagram.com/trinicanjam')
     expect(instagramLink.getAttribute('target')).toBe('_blank')
     expect(instagramLink.getAttribute('rel')).toBe('noopener noreferrer')
+  })
+
+  it('calls trackInstagramClick when the footer Instagram link is clicked', () => {
+    renderWithProvider(<PageWrapper />)
+
+    const instagramLink = screen.getByRole('link', { name: /instagram/i })
+    fireEvent.click(instagramLink)
+
+    expect(trackInstagramClick).toHaveBeenCalledTimes(1)
   })
 
   it('renders slots as empty when no props provided', () => {

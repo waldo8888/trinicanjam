@@ -9,8 +9,8 @@ import {
 
 describe('analytics', () => {
   beforeEach(() => {
-    // Provide a mock gtag on window to avoid "not a function" errors
-    vi.stubGlobal('gtag', vi.fn())
+    document.documentElement.setAttribute('data-ga4-id', 'G-TEST123456')
+    window.gtag = vi.fn()
   })
 
   it('exports trackMenuView as a function', () => {
@@ -33,8 +33,61 @@ describe('analytics', () => {
     expect(typeof trackPhoneClick).toBe('function')
   })
 
-  it('calls window.gtag when trackMenuView is invoked and gtag is available', () => {
+  it('calls window.gtag with the menu_view event contract', () => {
     trackMenuView()
-    expect(window.gtag).toHaveBeenCalledWith('event', 'menu_view', undefined)
+
+    expect(window.gtag).toHaveBeenCalledWith('event', 'menu_view', { debug_mode: true })
+  })
+
+  it('calls window.gtag with the directions_click event contract', () => {
+    trackDirectionsClick()
+
+    expect(window.gtag).toHaveBeenCalledWith('event', 'directions_click', { debug_mode: true })
+  })
+
+  it('calls window.gtag with the instagram_click event contract', () => {
+    trackInstagramClick()
+
+    expect(window.gtag).toHaveBeenCalledWith('event', 'instagram_click', { debug_mode: true })
+  })
+
+  it('calls window.gtag with the hours_view event contract', () => {
+    trackHoursView()
+
+    expect(window.gtag).toHaveBeenCalledWith('event', 'hours_view', { debug_mode: true })
+  })
+
+  it('calls window.gtag with the phone_click event contract', () => {
+    trackPhoneClick()
+
+    expect(window.gtag).toHaveBeenCalledWith('event', 'phone_click', { debug_mode: true })
+  })
+
+  it('degrades to a silent no-op when the GA4 ID is absent', () => {
+    window.gtag = vi.fn()
+    document.documentElement.setAttribute('data-ga4-id', '')
+
+    expect(() => {
+      trackMenuView()
+      trackDirectionsClick()
+      trackInstagramClick()
+      trackHoursView()
+      trackPhoneClick()
+    }).not.toThrow()
+
+    expect(window.gtag).not.toHaveBeenCalled()
+  })
+
+  it('degrades to a silent no-op when gtag is unavailable', () => {
+    document.documentElement.setAttribute('data-ga4-id', 'G-TEST123456')
+    window.gtag = undefined
+
+    expect(() => {
+      trackMenuView()
+      trackDirectionsClick()
+      trackInstagramClick()
+      trackHoursView()
+      trackPhoneClick()
+    }).not.toThrow()
   })
 })

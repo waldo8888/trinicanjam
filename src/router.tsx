@@ -1,14 +1,22 @@
 /* eslint-disable react-refresh/only-export-components -- page components are intentionally co-located with router config (ARCH-9) */
+import { Suspense, lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
+import { MAIN_CONTENT_ID } from '@/components/SkipLink/SkipLink'
 import { SEOHead, SITE_URL, RestaurantSchema } from '@/lib/seo'
 import { PageWrapper } from '@/sections/PageWrapper'
 import { HeroSection } from '@/sections/HeroSection'
 import { BrandStorySection } from '@/sections/BrandStorySection'
 import { FoodPhotographySection } from '@/sections/FoodPhotographySection'
-import { MenuSection } from '@/sections/MenuSection'
-import { VisitBlock } from '@/sections/VisitBlock'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AboutPage } from '@/pages/AboutPage'
+
+const LazyMenuSection = lazy(async () => ({
+  default: (await import('@/sections/MenuSection')).MenuSection,
+}))
+
+const LazyVisitBlock = lazy(async () => ({
+  default: (await import('@/sections/VisitBlock')).VisitBlock,
+}))
 
 // Epic 2: HomePage now uses HeroSection (Story 2.2)
 function HomePage() {
@@ -31,12 +39,18 @@ function HomePage() {
           <>
             <BrandStorySection />
             <FoodPhotographySection />
-            <ErrorBoundary>
-              <MenuSection />
-            </ErrorBoundary>
+            <Suspense fallback={null}>
+              <ErrorBoundary>
+                <LazyMenuSection />
+              </ErrorBoundary>
+            </Suspense>
           </>
         }
-        visitSlot={<VisitBlock />}
+        visitSlot={
+          <Suspense fallback={null}>
+            <LazyVisitBlock />
+          </Suspense>
+        }
       />
     </>
   )
@@ -44,7 +58,7 @@ function HomePage() {
 
 function MenuPage() {
   return (
-    <main>
+    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
       <SEOHead
         title="Menu"
         description="Browse the full Trinicanjam Cuisine menu — Trinidadian & Jamaican starters, mains, and drinks in Hamilton, Ontario."
@@ -59,7 +73,7 @@ function MenuPage() {
 
 function VisitPage() {
   return (
-    <main>
+    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
       <SEOHead
         title="Visit"
         description="Find Trinicanjam Cuisine in Hamilton, Ontario — address, opening hours, directions, and contact information."
@@ -76,7 +90,7 @@ function VisitPage() {
 
 function NotFoundPage() {
   return (
-    <main>
+    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
       <SEOHead
         title="Page Not Found — Trinicanjam Cuisine"
         description="The page you are looking for does not exist."

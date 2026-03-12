@@ -28,7 +28,7 @@
 }
 
 .neighbourhood {
-  color: var(--color-brand-gold);
+  color: var(--color-cream-200);
   font-size: var(--text-caption);
 }
 
@@ -42,7 +42,7 @@
 .hoursTable thead th {
   padding: var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--color-brand-gold);
-  color: var(--color-brand-gold);
+  color: var(--color-cream-200);
   font-weight: 500;
   text-align: left;
 }
@@ -64,8 +64,19 @@
 }
 
 .phoneLink {
-  color: var(--color-cta-web);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--space-2);
+  margin-inline: calc(var(--space-2) * -1);
+  color: var(--color-brand-white);
   text-decoration: underline;
+}
+
+.phoneLink:focus-visible,
+.ctaPrimary:focus-visible,
+.ctaOutlined:focus-visible {
+  border-radius: 2px;
 }
 
 .ctas {

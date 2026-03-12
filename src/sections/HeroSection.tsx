@@ -2,6 +2,10 @@ import { useRef, useState } from 'react'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import styles from './HeroSection.module.css'
 
+function notifyHeroReady() {
+  window.dispatchEvent(new Event('trinicanjam:hero-ready'))
+}
+
 export function HeroSection() {
   const prefersReducedMotion = useReducedMotion()
   const [loaded, setLoaded] = useState(prefersReducedMotion)
@@ -14,6 +18,7 @@ export function HeroSection() {
   const handleLoad = () => {
     if (prefersReducedMotion) {
       setLoaded(true)
+      notifyHeroReady()
       return
     }
 
@@ -24,8 +29,11 @@ export function HeroSection() {
       !imageRef.current
     ) {
       setLoaded(true)
+      notifyHeroReady()
       return
     }
+
+    notifyHeroReady()
 
     void (async () => {
       try {
@@ -51,12 +59,13 @@ export function HeroSection() {
   const handleError = () => {
     // AC6: Never leave the section broken — show text immediately on image error
     setLoaded(true)
+    notifyHeroReady()
   }
 
   const isTextHidden = !loaded && !prefersReducedMotion
 
   return (
-    <section role="banner" data-zone="dark" className={styles.hero}>
+    <section aria-labelledby="hero-title" data-zone="dark" className={styles.hero}>
       {/*
         TODO: ARCH-5 — wrap in <picture> with <source type="image/avif" srcSet="/assets/images/hero.avif" />
         when hero.avif is available pre-launch. Do NOT add the source tag without the actual AVIF file
@@ -91,7 +100,7 @@ export function HeroSection() {
         <span ref={eyebrowRef} className={styles.eyebrow}>
           Authentic Caribbean Cuisine · Hamilton, Ontario
         </span>
-        <h1 ref={titleRef} className={styles.title}>
+        <h1 id="hero-title" ref={titleRef} className={styles.title}>
           Trinicanjam Cuisine
         </h1>
         <p ref={taglineRef} className={styles.tagline}>

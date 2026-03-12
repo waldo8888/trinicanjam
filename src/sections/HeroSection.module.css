@@ -44,7 +44,7 @@
   font-size: 0.6875rem; /* 11px — no token; smaller than --text-caption (13px) per UX spec */
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--color-brand-gold);
+  color: var(--color-cream-200);
   margin-bottom: var(--space-3);
 }
 

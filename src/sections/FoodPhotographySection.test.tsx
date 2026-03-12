@@ -27,6 +27,22 @@ describe('FoodPhotographySection', () => {
     })
   })
 
+  it('uses specific alt copy for the curated food photography set', () => {
+    render(<FoodPhotographySection />)
+
+    expect(
+      screen.getByRole('img', {
+        name: 'Jerk chicken served with rice and peas at Trinicanjam Cuisine',
+      }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('img', {
+        name: 'Chef-plated sampler of Caribbean mains and sides ready for service at Trinicanjam Cuisine',
+      }),
+    ).toBeInTheDocument()
+  })
+
   it('first image is eager-loaded; all remaining images are lazy-loaded', () => {
     const { container } = render(<FoodPhotographySection />)
     const images = Array.from(container.querySelectorAll('img'))

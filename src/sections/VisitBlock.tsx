@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { MapEmbed } from '@/components/MapEmbed/MapEmbed'
+import { SocialProofGrid } from '@/components/SocialProofGrid/SocialProofGrid'
 import { trackDirectionsClick, trackHoursView, trackPhoneClick } from '@/lib/analytics'
 import styles from './VisitBlock.module.css'
 
@@ -78,6 +79,8 @@ export function VisitBlock() {
         </p>
 
         <MapEmbed />
+
+        <SocialProofGrid />
 
         <div className={styles.ctas}>
           <a

@@ -6,7 +6,9 @@ import { AboutPage } from './AboutPage'
 afterEach(() => {
   cleanup()
   document.head
-    .querySelectorAll('title, meta[name="description"], link[rel="canonical"], link[rel="alternate"]')
+    .querySelectorAll(
+      'title, meta[name="description"], meta[property^="og:"], meta[name^="twitter:"], link[rel="canonical"], link[rel="alternate"]',
+    )
     .forEach((el) => el.remove())
 })
 
@@ -51,6 +53,17 @@ describe('AboutPage', () => {
     renderAbout()
     const brandSection = document.querySelector('section[aria-labelledby="brand-story-heading"]')
     expect(brandSection).toBeTruthy()
+    expect(brandSection?.closest('[data-zone="warm"]')).toBeTruthy()
+  })
+
+  it('renders About OG metadata for route sharing', () => {
+    renderAbout()
+    expect(document.querySelector('meta[property="og:url"]')?.getAttribute('content')).toBe(
+      'https://trinicanjam.ca/about',
+    )
+    expect(document.querySelector('meta[property="og:image"]')?.getAttribute('content')).toBe(
+      'https://trinicanjam.ca/assets/og-image.jpg',
+    )
   })
 
   it('renders CTA section with menu and visit links', () => {

@@ -48,8 +48,12 @@ describe('DishCard', () => {
 
   it('renders an <img> when imageSrc is provided', () => {
     const itemWithImage: MenuItem = { ...mockItem, imageSrc: '/images/jerk-chicken.jpg' }
-    render(<DishCard item={itemWithImage} />)
-    expect(screen.getByRole('img', { name: 'Jerk Chicken' })).toBeTruthy()
+    const { container } = render(<DishCard item={itemWithImage} />)
+    const image = container.querySelector('img')
+
+    expect(image).toBeTruthy()
+    expect(image).toHaveAttribute('alt', '')
+    expect(screen.queryByRole('img')).toBeNull()
   })
 
   // Featured variant tests (AC7)
@@ -59,17 +63,23 @@ describe('DishCard', () => {
   })
 
   it('renders featured image with 800x450 dimensions', () => {
-    const { getByRole } = render(<DishCard item={mockFeaturedItem} variant="featured" />)
-    const img = getByRole('img')
+    const { container } = render(<DishCard item={mockFeaturedItem} variant="featured" />)
+    const img = container.querySelector('img')
+
+    expect(img).toBeTruthy()
     expect(img).toHaveAttribute('width', '800')
     expect(img).toHaveAttribute('height', '450')
+    expect(img).toHaveAttribute('alt', '')
   })
 
   it('renders compact image with 400x300 dimensions (regression)', () => {
-    const { getByRole } = render(<DishCard item={mockFeaturedItem} variant="compact" />)
-    const img = getByRole('img')
+    const { container } = render(<DishCard item={mockFeaturedItem} variant="compact" />)
+    const img = container.querySelector('img')
+
+    expect(img).toBeTruthy()
     expect(img).toHaveAttribute('width', '400')
     expect(img).toHaveAttribute('height', '300')
+    expect(img).toHaveAttribute('alt', '')
   })
 
   it('renders placeholder (no img) when imageSrc absent in featured variant', () => {

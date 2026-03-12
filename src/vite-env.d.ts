@@ -5,6 +5,7 @@
 declare const __GA4_ID__: string
 
 interface ImportMetaEnv {
+	readonly VITE_GA4_ID: string
 	readonly VITE_MAPS_EMBED_KEY: string
 }
 

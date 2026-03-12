@@ -12,10 +12,10 @@ const RESTAURANT_SCHEMA = {
   image: `${SITE_URL}/assets/og-image.jpg`,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '123 King St W',                       // TODO: replace with real address
+    streetAddress: '123 King Street East',                // TODO: replace with real address
     addressLocality: 'Hamilton',
     addressRegion: 'ON',
-    postalCode: 'L8P 4W3',                               // TODO: replace with real postal code
+    postalCode: 'L8N 1A1',                                // TODO: replace with real postal code
     addressCountry: 'CA',
   },
   openingHoursSpecification: [

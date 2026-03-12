@@ -29,6 +29,7 @@ export function StickyUtilityBar({ heroRef }: StickyUtilityBarProps) {
   return (
     <nav
       aria-label="Utility navigation"
+      aria-hidden={!isVisible}
       data-zone="dark"
       className={styles.bar}
       style={{
@@ -39,8 +40,8 @@ export function StickyUtilityBar({ heroRef }: StickyUtilityBarProps) {
     >
       <span className={styles.wordmark}>Trinicanjam</span>
       <div className={styles.actions}>
-        <a href="/#menu" className={styles.ctaGhost}>Menu</a>
-        <a href="/#visit" className={styles.ctaCrimson}>Visit</a>
+        <a href="/#menu" className={styles.ctaGhost} tabIndex={isVisible ? 0 : -1}>Menu</a>
+        <a href="/#visit" className={styles.ctaCrimson} tabIndex={isVisible ? 0 : -1}>Visit</a>
       </div>
     </nav>
   )

@@ -49,12 +49,7 @@
 
 html {
   font-size: 100%; /* rem base = 16px; never override this */
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+  scroll-behavior: smooth;
 }
 
 body {
@@ -84,27 +79,14 @@ select {
   font: inherit;
 }
 
-/* =================================================================
-   ACCESSIBILITY — Skip to Content Link
-   Hidden visually until focused (will be styled fully in Epic 6)
-   ================================================================= */
-
-.skip-to-content {
-  position: absolute;
-  top: -100%;
-  left: var(--space-4);
-  z-index: var(--z-modal);
-  padding: var(--space-3) var(--space-6);
-  background: var(--color-brand-crimson);
-  color: var(--color-brand-white);
-  font-family: var(--font-ui);
-  font-size: var(--text-ui);
-  text-decoration: none;
-  border-radius: 0 0 4px 4px;
+:where(a, button, input, textarea, select, summary, [role='button'], [role='tab']):focus-visible {
+  outline: 2px solid var(--color-brand-crimson);
+  outline-offset: 3px;
 }
 
-.skip-to-content:focus {
-  top: 0;
+:where([data-zone='dark'], [data-zone='gradient'])
+  :where(a, button, input, textarea, select, summary, [role='button'], [role='tab']):focus-visible {
+  outline-color: var(--color-brand-white);
 }
 
 /* =================================================================
@@ -117,12 +99,15 @@ select {
    ================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }

@@ -68,6 +68,12 @@
   transition: transform 100ms ease;
 }
 
+.ctaGhost:focus-visible,
+.ctaCrimson:focus-visible {
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-dark-900) 60%, transparent);
+}
+
 /* Filled crimson CTA — "Visit" */
 .ctaCrimson {
   display: inline-flex;

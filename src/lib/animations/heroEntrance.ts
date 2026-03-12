@@ -30,7 +30,6 @@ export async function animateHeroEntrance(elements: {
 
   gsap
     .timeline()
-    .from(elements.image, { opacity: 0.6, duration: 0.4, ease: 'none' })
     .fromTo(
       [elements.eyebrow, elements.title, elements.tagline],
       { opacity: 0, y: 24 },

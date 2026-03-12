@@ -1,5 +1,7 @@
 // Mocks must be at file top — Vitest hoists these before imports
 import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 vi.mock('gsap', () => ({
   gsap: {
@@ -29,17 +31,17 @@ import { animateHeroEntrance } from '@/lib/animations/heroEntrance'
 import { HeroSection } from '@/sections/HeroSection'
 
 describe('HeroSection', () => {
-  it('renders a section with role="banner"', () => {
+  it('renders a labelled hero region', () => {
     render(<HeroSection />)
-    const banner = screen.getByRole('banner')
-    expect(banner).toBeTruthy()
-    expect(banner.tagName.toLowerCase()).toBe('section')
+    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
+    expect(region).toBeTruthy()
+    expect(region.tagName.toLowerCase()).toBe('section')
   })
 
   it('renders section with data-zone="dark"', () => {
     render(<HeroSection />)
-    const banner = screen.getByRole('banner')
-    expect(banner.getAttribute('data-zone')).toBe('dark')
+    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
+    expect(region.getAttribute('data-zone')).toBe('dark')
   })
 
   it('renders hero image with correct src', () => {
@@ -62,6 +64,12 @@ describe('HeroSection', () => {
     expect(img.getAttribute('loading')).toBe('eager')
   })
 
+  it('renders hero image with fetchpriority="high" to protect the LCP path', () => {
+    render(<HeroSection />)
+    const img = screen.getByRole('img')
+    expect(img.getAttribute('fetchpriority')).toBe('high')
+  })
+
   it('renders h1 with restaurant name', () => {
     render(<HeroSection />)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Trinicanjam Cuisine')
@@ -74,17 +82,17 @@ describe('HeroSection', () => {
 
   it('overlay div has aria-hidden="true"', () => {
     render(<HeroSection />)
-    const banner = screen.getByRole('banner')
-    const overlay = banner.querySelector('[aria-hidden="true"]')
+    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
+    const overlay = region.querySelector('[aria-hidden="true"]')
     expect(overlay).toBeTruthy()
   })
 
   it('contains no buttons, nav, or anchor elements (AC5 — no UI controls)', () => {
     render(<HeroSection />)
-    const banner = screen.getByRole('banner')
-    expect(banner.querySelector('button')).toBeNull()
-    expect(banner.querySelector('nav')).toBeNull()
-    expect(banner.querySelector('a')).toBeNull()
+    const region = screen.getByRole('region', { name: 'Trinicanjam Cuisine' })
+    expect(region.querySelector('button')).toBeNull()
+    expect(region.querySelector('nav')).toBeNull()
+    expect(region.querySelector('a')).toBeNull()
   })
 
   it('renders hero image with explicit width and height for CLS prevention (AC6)', () => {
@@ -183,5 +191,14 @@ describe('HeroSection with prefers-reduced-motion', () => {
     const img = screen.getByRole('img')
     fireEvent.load(img)
     expect(animateHeroEntrance).not.toHaveBeenCalled()
+  })
+})
+
+describe('HeroSection performance guardrails', () => {
+  it('does not animate the hero image opacity on the LCP path', () => {
+    const sourcePath = resolve(process.cwd(), 'src/lib/animations/heroEntrance.ts')
+    const source = readFileSync(sourcePath, 'utf8')
+
+    expect(source).not.toContain('.from(elements.image')
   })
 })

@@ -1,0 +1,20 @@
+.skipLink {
+  position: fixed;
+  top: -100%;
+  left: var(--space-4);
+  z-index: var(--z-modal);
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-brand-crimson);
+  color: var(--color-brand-white);
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+}
+
+.skipLink:focus-visible {
+  top: var(--space-4);
+  outline: 2px solid var(--color-brand-white);
+  outline-offset: 2px;
+}

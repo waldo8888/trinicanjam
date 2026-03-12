@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { SkipLink, MAIN_CONTENT_ID } from '@/components/SkipLink/SkipLink'
 import { routes } from '@/router'
 import { TonalZoneProvider } from '@/context/TonalZoneContext'
 
@@ -18,7 +19,10 @@ function renderAt(path: string) {
   })
   render(
     <TonalZoneProvider>
-      <RouterProvider router={testRouter} />
+      <>
+        <SkipLink />
+        <RouterProvider router={testRouter} />
+      </>
     </TonalZoneProvider>,
   )
 }
@@ -26,6 +30,11 @@ function renderAt(path: string) {
 describe('router', () => {
   it('renders PageWrapper three-zone shell at /', () => {
     renderAt('/')
+    expect(screen.getByRole('link', { name: /skip to main content/i })).toHaveAttribute(
+      'href',
+      `#${MAIN_CONTENT_ID}`,
+    )
+    expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
     // PageWrapper renders three data-zone sections and a footer (Story 2.1)
     expect(document.querySelector('[data-zone="dark"]')).toBeTruthy()
     expect(document.querySelector('[data-zone="warm"]')).toBeTruthy()
@@ -38,23 +47,35 @@ describe('router', () => {
     expect(screen.getByRole('heading', { level: 1, name: /Trinicanjam Cuisine/i })).toBeTruthy()
   })
 
+  it('injects the homepage hero preload link into the document head', () => {
+    renderAt('/')
+
+    const preloadLink = document.head.querySelector('link[rel="preload"][as="image"]')
+    expect(preloadLink).toHaveAttribute('href', '/assets/images/hero.webp')
+    expect(preloadLink).toHaveAttribute('fetchpriority', 'high')
+  })
+
   it('renders MenuPage heading at /menu', () => {
     renderAt('/menu')
+    expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Menu' })).toBeTruthy()
   })
 
   it('renders VisitPage heading at /visit', () => {
     renderAt('/visit')
+    expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Visit' })).toBeTruthy()
   })
 
   it('renders AboutPage heading at /about', () => {
     renderAt('/about')
+    expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
     expect(screen.getByRole('heading', { level: 1, name: /Our Story/i })).toBeTruthy()
   })
 
   it('renders NotFoundPage for unmatched routes', () => {
     renderAt('/does-not-exist')
+    expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
     expect(screen.getByRole('heading', { name: /404/i })).toBeTruthy()
   })
 })

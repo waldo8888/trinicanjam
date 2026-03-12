@@ -53,7 +53,7 @@ const FOOD_PHOTOS: FoodPhoto[] = [
   {
     id: 'food-6',
     src: photo6,
-    alt: 'Beautifully plated Caribbean dishes at Trinicanjam Cuisine, Hamilton Ontario',
+    alt: 'Chef-plated sampler of Caribbean mains and sides ready for service at Trinicanjam Cuisine',
     loading: 'lazy',
   },
 ]

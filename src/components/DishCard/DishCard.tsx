@@ -17,7 +17,7 @@ export function DishCard({ item, variant = 'compact' }: DishCardProps) {
       {item.imageSrc ? (
         <img
           src={item.imageSrc}
-          alt={item.name}
+          alt=""
           width={isFeatured ? 800 : 400}
           height={isFeatured ? 450 : 300}
           loading="lazy"

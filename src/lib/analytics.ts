@@ -17,7 +17,12 @@ function isDebugEnvironment(): boolean {
 
   const hostname = window.location.hostname
 
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '[::1]' ||
+    hostname.endsWith('.vercel.app')
+  )
 }
 
 function getMeasurementId(): string {

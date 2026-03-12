@@ -12,7 +12,12 @@ const GTAG_JS_ORIGIN = 'https://www.googletagmanager.com/gtag/js'
 function shouldEnableDebugMode() {
   const hostname = window.location.hostname
 
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '[::1]' ||
+    hostname.endsWith('.vercel.app')
+  )
 }
 
 function injectGtagScript(measurementId: string) {

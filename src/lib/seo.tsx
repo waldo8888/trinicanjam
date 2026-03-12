@@ -1,5 +1,45 @@
 export const SITE_URL = 'https://trinicanjam.ca'
 
+// Restaurant JSON-LD schema — all fields are placeholder values marked TODO where real data is needed
+const RESTAURANT_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: 'Trinicanjam Cuisine',                            // TODO: confirm legal name
+  url: SITE_URL,
+  telephone: '+19055551234',                              // TODO: replace with real phone
+  servesCuisine: ['Caribbean', 'Trinidadian', 'Jamaican'],
+  priceRange: '$$',
+  image: `${SITE_URL}/assets/og-image.jpg`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '123 King St W',                       // TODO: replace with real address
+    addressLocality: 'Hamilton',
+    addressRegion: 'ON',
+    postalCode: 'L8P 4W3',                               // TODO: replace with real postal code
+    addressCountry: 'CA',
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday'],
+      opens: '11:00',
+      closes: '21:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Friday', 'Saturday'],
+      opens: '11:00',
+      closes: '22:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Sunday'],
+      opens: '12:00',
+      closes: '20:00',
+    },
+  ],
+} as const
+
 interface SEOHeadProps {
   title: string
   description: string
@@ -40,5 +80,14 @@ export function SEOHead({
       <meta name="twitter:description" content={description} />
       {ogImage && <meta name="twitter:image" content={ogImage} />}
     </>
+  )
+}
+
+export function RestaurantSchema() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(RESTAURANT_SCHEMA) }}
+    />
   )
 }

@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- page components are intentionally co-located with router config (ARCH-9) */
 import { createBrowserRouter } from 'react-router-dom'
-import { SEOHead, SITE_URL } from '@/lib/seo'
+import { SEOHead, SITE_URL, RestaurantSchema } from '@/lib/seo'
 import { PageWrapper } from '@/sections/PageWrapper'
 import { HeroSection } from '@/sections/HeroSection'
 import { BrandStorySection } from '@/sections/BrandStorySection'
@@ -20,6 +20,7 @@ function HomePage() {
         ogUrl={SITE_URL}
         preloadHeroImage="/assets/images/hero.webp"
       />
+      <RestaurantSchema />
       <PageWrapper
         heroSlot={<HeroSection />}
         contentSlot={

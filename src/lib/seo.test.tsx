@@ -1,13 +1,13 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { render, cleanup } from '@testing-library/react'
-import { SEOHead, SITE_URL } from '@/lib/seo'
+import { SEOHead, SITE_URL, RestaurantSchema } from '@/lib/seo'
 
 afterEach(() => {
   cleanup()
   // Explicitly remove hoisted metadata between tests to guard against jsdom persistence
   document.head
     .querySelectorAll(
-      'title, meta[name="description"], meta[property^="og:"], meta[name^="twitter:"], link[rel="preload"]',
+      'title, meta[name="description"], meta[property^="og:"], meta[name^="twitter:"], link[rel="preload"], script[type="application/ld+json"]',
     )
     .forEach((el) => el.remove())
 })
@@ -124,5 +124,36 @@ describe('SEOHead', () => {
 
   it('exports SITE_URL constant as the production domain', () => {
     expect(SITE_URL).toBe('https://trinicanjam.ca')
+  })
+})
+
+describe('RestaurantSchema', () => {
+  it('renders a script tag with type application/ld+json', () => {
+    render(<RestaurantSchema />)
+    const script = document.querySelector('script[type="application/ld+json"]')
+    expect(script).toBeTruthy()
+  })
+
+  it('script content is valid JSON with @type Restaurant', () => {
+    render(<RestaurantSchema />)
+    const script = document.querySelector('script[type="application/ld+json"]')
+    const parsed = JSON.parse(script?.textContent ?? '{}')
+    expect(parsed['@type']).toBe('Restaurant')
+  })
+
+  it('schema has a non-empty name', () => {
+    render(<RestaurantSchema />)
+    const script = document.querySelector('script[type="application/ld+json"]')
+    const parsed = JSON.parse(script?.textContent ?? '{}')
+    expect(typeof parsed.name).toBe('string')
+    expect(parsed.name.length).toBeGreaterThan(0)
+  })
+
+  it('openingHoursSpecification is an array with at least one entry', () => {
+    render(<RestaurantSchema />)
+    const script = document.querySelector('script[type="application/ld+json"]')
+    const parsed = JSON.parse(script?.textContent ?? '{}')
+    expect(Array.isArray(parsed.openingHoursSpecification)).toBe(true)
+    expect(parsed.openingHoursSpecification.length).toBeGreaterThanOrEqual(1)
   })
 })

@@ -50,6 +50,16 @@ function bootstrapGa4() {
 
   const queueCommand = window.gtag
 
+  // Set consent defaults before any hits fire.
+  // analytics_storage: 'granted' — CASL-compliant; no consent barrier required for analytics.
+  // All ad-related storage remains denied to match our privacy posture.
+  queueCommand?.('consent', 'default', {
+    analytics_storage: 'granted',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+  })
+
   queueCommand?.('js', new Date())
   queueCommand?.('config', measurementId, {
     anonymize_ip: true,

@@ -9,6 +9,7 @@ declare global {
 }
 
 const GA4_ID_ATTRIBUTE = 'data-ga4-id'
+const PRODUCTION_VERCEL_ALIAS = 'trinicanjam.vercel.app'
 
 function isDebugEnvironment(): boolean {
   if (typeof window === 'undefined') {
@@ -21,7 +22,7 @@ function isDebugEnvironment(): boolean {
     hostname === 'localhost' ||
     hostname === '127.0.0.1' ||
     hostname === '[::1]' ||
-    hostname.endsWith('.vercel.app')
+    (hostname.endsWith('.vercel.app') && hostname !== PRODUCTION_VERCEL_ALIAS)
   )
 }
 

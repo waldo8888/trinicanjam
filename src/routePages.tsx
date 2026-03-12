@@ -1,12 +1,47 @@
+import type { ReactNode } from 'react'
 import { MAIN_CONTENT_ID } from '@/components/SkipLink/SkipLink'
 import { SEOHead, SITE_URL, RestaurantSchema } from '@/lib/seo'
+import { trackInstagramClick } from '@/lib/analytics'
 import { PageWrapper } from '@/sections/PageWrapper'
 import { HeroSection } from '@/sections/HeroSection'
 import { BrandStorySection } from '@/sections/BrandStorySection'
 import { FoodPhotographySection } from '@/sections/FoodPhotographySection'
 import { MenuSection } from '@/sections/MenuSection'
 import { VisitBlock } from '@/sections/VisitBlock'
+import { StickyUtilityBar } from '@/sections/StickyUtilityBar'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import pageWrapperStyles from '@/sections/PageWrapper.module.css'
+
+function RouteFrame({
+  children,
+  menuHref = '/menu',
+  visitHref = '/visit',
+}: {
+  children: ReactNode
+  menuHref?: string
+  visitHref?: string
+}) {
+  return (
+    <div>
+      <StickyUtilityBar forceVisible menuHref={menuHref} visitHref={visitHref} />
+      <main id={MAIN_CONTENT_ID} tabIndex={-1}>
+        {children}
+      </main>
+      <footer data-zone="gradient" className={pageWrapperStyles.footer}>
+        <p>© {new Date().getFullYear()} Trinicanjam Cuisine. Hamilton, Ontario.</p>
+        <a
+          href="https://instagram.com/trinicanjam"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Trinicanjam Cuisine on Instagram"
+          onClick={trackInstagramClick}
+        >
+          Instagram
+        </a>
+      </footer>
+    </div>
+  )
+}
 
 export function HomePage() {
   return (
@@ -41,7 +76,7 @@ export function HomePage() {
 
 export function MenuPage() {
   return (
-    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
+    <RouteFrame menuHref="/menu" visitHref="/visit">
       <SEOHead
         title="Menu"
         description="Browse the full Trinicanjam Cuisine menu — Trinidadian & Jamaican starters, mains, and drinks in Hamilton, Ontario."
@@ -50,13 +85,16 @@ export function MenuPage() {
         canonical={`${SITE_URL}/menu`}
       />
       <h1>Menu</h1>
-    </main>
+      <ErrorBoundary>
+        <MenuSection />
+      </ErrorBoundary>
+    </RouteFrame>
   )
 }
 
 export function VisitPage() {
   return (
-    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
+    <RouteFrame menuHref="/menu" visitHref="/visit">
       <SEOHead
         title="Visit"
         description="Find Trinicanjam Cuisine in Hamilton, Ontario — address, opening hours, directions, and contact information."
@@ -65,13 +103,16 @@ export function VisitPage() {
         canonical={`${SITE_URL}/visit`}
       />
       <h1>Visit</h1>
-    </main>
+      <ErrorBoundary>
+        <VisitBlock />
+      </ErrorBoundary>
+    </RouteFrame>
   )
 }
 
 export function NotFoundPage() {
   return (
-    <main id={MAIN_CONTENT_ID} tabIndex={-1}>
+    <RouteFrame>
       <SEOHead
         title="Page Not Found — Trinicanjam Cuisine"
         description="The page you are looking for does not exist."
@@ -81,6 +122,6 @@ export function NotFoundPage() {
       <p>
         <a href="/">← Back to Home</a>
       </p>
-    </main>
+    </RouteFrame>
   )
 }

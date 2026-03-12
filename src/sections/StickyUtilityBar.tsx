@@ -3,15 +3,28 @@ import { useReducedMotion } from '@/lib/useReducedMotion'
 import styles from './StickyUtilityBar.module.css'
 
 interface StickyUtilityBarProps {
-  heroRef: React.RefObject<HTMLElement | null>
+  heroRef?: React.RefObject<HTMLElement | null>
+  forceVisible?: boolean
+  menuHref?: string
+  visitHref?: string
 }
 
-export function StickyUtilityBar({ heroRef }: StickyUtilityBarProps) {
+export function StickyUtilityBar({
+  heroRef,
+  forceVisible = false,
+  menuHref = '/#menu',
+  visitHref = '/#visit',
+}: StickyUtilityBarProps) {
   const [isVisible, setIsVisible] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const shouldShow = forceVisible || isVisible
 
   useEffect(() => {
-    const el = heroRef.current
+    if (forceVisible) {
+      return
+    }
+
+    const el = heroRef?.current
     if (!el) return
 
     const observer = new IntersectionObserver(
@@ -24,24 +37,23 @@ export function StickyUtilityBar({ heroRef }: StickyUtilityBarProps) {
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [heroRef])
+  }, [forceVisible, heroRef])
 
   return (
     <nav
       aria-label="Utility navigation"
-      aria-hidden={!isVisible}
+      aria-hidden={!shouldShow}
       data-zone="dark"
-      className={styles.bar}
-      style={{
-        opacity: isVisible ? 1 : 0,
-        pointerEvents: isVisible ? 'auto' : 'none',
-        transitionDuration: prefersReducedMotion ? '0ms' : '300ms',
-      }}
+      className={[
+        styles.bar,
+        shouldShow ? styles.visible : '',
+        prefersReducedMotion ? styles.reducedMotion : '',
+      ].filter(Boolean).join(' ')}
     >
       <span className={styles.wordmark}>Trinicanjam</span>
       <div className={styles.actions}>
-        <a href="/#menu" className={styles.ctaGhost} tabIndex={isVisible ? 0 : -1}>Menu</a>
-        <a href="/#visit" className={styles.ctaCrimson} tabIndex={isVisible ? 0 : -1}>Visit</a>
+        <a href={menuHref} className={styles.ctaGhost} tabIndex={shouldShow ? 0 : -1}>Menu</a>
+        <a href={visitHref} className={styles.ctaCrimson} tabIndex={shouldShow ? 0 : -1}>Visit</a>
       </div>
     </nav>
   )

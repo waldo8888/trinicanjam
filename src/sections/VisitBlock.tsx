@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { MapEmbed } from '@/components/MapEmbed/MapEmbed'
 import { SocialProofGrid } from '@/components/SocialProofGrid/SocialProofGrid'
 import { trackDirectionsClick, trackHoursView, trackPhoneClick } from '@/lib/analytics'
@@ -20,11 +20,34 @@ const OPENING_HOURS: HoursRow[] = [
   { day: 'Monday', dayIndex: 1, hours: 'Closed' },
 ]
 
+function isIntentionalVisitView() {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return window.location.pathname === '/visit' || window.location.hash === '#visit'
+}
+
 export function VisitBlock() {
   const todayIndex = new Date().getDay()
+  const hasTrackedView = useRef(false)
 
   useEffect(() => {
-    trackHoursView()
+    const maybeTrackHoursView = () => {
+      if (hasTrackedView.current || !isIntentionalVisitView()) {
+        return
+      }
+
+      hasTrackedView.current = true
+      trackHoursView()
+    }
+
+    maybeTrackHoursView()
+    window.addEventListener('hashchange', maybeTrackHoursView)
+
+    return () => {
+      window.removeEventListener('hashchange', maybeTrackHoursView)
+    }
   }, [])
 
   return (

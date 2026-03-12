@@ -28,6 +28,7 @@ const MOCK_CATEGORIES = ['starters', 'mains'] as const
 describe('MenuSection', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    window.history.replaceState({}, '', '/')
   })
 
   it('renders a tab button for each category', () => {
@@ -94,10 +95,21 @@ describe('MenuSection', () => {
     expect(source).toContain('startTransition')
   })
 
-  it('calls trackMenuView once on mount', () => {
+  it('calls trackMenuView once on the dedicated menu route', () => {
     const spy = vi.spyOn(analytics, 'trackMenuView').mockImplementation(() => {})
+    window.history.replaceState({}, '', '/menu')
+
     render(<MenuSection />)
+
     expect(spy).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call trackMenuView on a generic route without menu intent', () => {
+    const spy = vi.spyOn(analytics, 'trackMenuView').mockImplementation(() => {})
+
+    render(<MenuSection />)
+
+    expect(spy).not.toHaveBeenCalled()
   })
 
   it('renders a Plan Your Visit link pointing to /#visit', () => {

@@ -58,13 +58,24 @@ describe('router', () => {
   it('renders MenuPage heading at /menu', () => {
     renderAt('/menu')
     expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: /utility navigation/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Menu' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /Our Menu/i })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Plan Your Visit/i })).toHaveAttribute('href', '/#visit')
+    expect(screen.getByRole('link', { name: /trinicanjam cuisine on instagram/i })).toBeInTheDocument()
   })
 
   it('renders VisitPage heading at /visit', () => {
     renderAt('/visit')
     expect(document.querySelector(`main#${MAIN_CONTENT_ID}`)).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: /utility navigation/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Visit' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /Find Us/i })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Get Directions/i })).toHaveAttribute(
+      'href',
+      'https://maps.google.com/?q=Trinicanjam+Cuisine+Hamilton+Ontario',
+    )
+    expect(screen.getByRole('link', { name: /trinicanjam cuisine on instagram/i })).toBeInTheDocument()
   })
 
   it('renders AboutPage heading at /about', () => {

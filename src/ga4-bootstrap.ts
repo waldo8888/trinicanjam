@@ -8,6 +8,7 @@ declare global {
 const GA4_ID_ATTRIBUTE = 'data-ga4-id'
 const GA4_LOADER_ATTRIBUTE = 'data-ga4-loader'
 const GTAG_JS_ORIGIN = 'https://www.googletagmanager.com/gtag/js'
+const PRODUCTION_VERCEL_ALIAS = 'trinicanjam.vercel.app'
 
 function shouldEnableDebugMode() {
   const hostname = window.location.hostname
@@ -16,7 +17,7 @@ function shouldEnableDebugMode() {
     hostname === 'localhost' ||
     hostname === '127.0.0.1' ||
     hostname === '[::1]' ||
-    hostname.endsWith('.vercel.app')
+    (hostname.endsWith('.vercel.app') && hostname !== PRODUCTION_VERCEL_ALIAS)
   )
 }
 
@@ -70,6 +71,7 @@ function bootstrapGa4() {
     anonymize_ip: true,
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
+    cookie_domain: window.location.hostname,
     debug_mode: shouldEnableDebugMode(),
   })
 }

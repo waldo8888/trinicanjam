@@ -15,11 +15,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-6); /* 24px horizontal padding */
+    opacity: 0;
+    pointer-events: none;
 
-  /* Transition: opacity + pointer-events controlled via inline style.
-     transitionDuration is overridden to 0ms when prefers-reduced-motion is active.
-     transition-property declared here; duration set by JS. */
   transition-property: opacity;
+    transition-duration: 300ms;
   transition-timing-function: ease-out;
 
   /* Backdrop blur for legibility across all three tonal zones */
@@ -28,6 +28,15 @@
   /* color-mix uses the design token and applies 92% opacity for backdrop translucency.
      Avoids hardcoded rgba() values per token architecture requirement (Task 2). */
   background: color-mix(in srgb, var(--color-dark-900) 92%, transparent);
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reducedMotion {
+  transition-duration: 0ms;
 }
 
 .wordmark {

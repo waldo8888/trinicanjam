@@ -9,12 +9,35 @@ function formatCategory(category: MenuCategory): string {
   return category.charAt(0).toUpperCase() + category.slice(1)
 }
 
+function isIntentionalMenuView() {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return window.location.pathname === '/menu' || window.location.hash === '#menu'
+}
+
 export function MenuSection() {
   const [activeCategory, setActiveCategory] = useState<MenuCategory>(MENU_CATEGORIES[0])
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const hasTrackedView = useRef(false)
 
   useEffect(() => {
-    trackMenuView()
+    const maybeTrackMenuView = () => {
+      if (hasTrackedView.current || !isIntentionalMenuView()) {
+        return
+      }
+
+      hasTrackedView.current = true
+      trackMenuView()
+    }
+
+    maybeTrackMenuView()
+    window.addEventListener('hashchange', maybeTrackMenuView)
+
+    return () => {
+      window.removeEventListener('hashchange', maybeTrackMenuView)
+    }
   }, [])
 
   const updateActiveCategory = (category: MenuCategory) => {

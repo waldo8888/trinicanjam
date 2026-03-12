@@ -13,6 +13,7 @@ vi.mock('@/lib/analytics', () => ({
 describe('VisitBlock', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    window.history.replaceState({}, '', '/')
   })
 
   it('renders restaurant address', () => {
@@ -36,10 +37,18 @@ describe('VisitBlock', () => {
     expect(todayRow?.className).toContain('todayRow')
   })
 
-  it('tracks hours view on mount', () => {
+  it('tracks hours view on the dedicated visit route', () => {
+    window.history.replaceState({}, '', '/visit')
+
     render(<VisitBlock />)
 
     expect(trackHoursView).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not track hours view on a generic route without visit intent', () => {
+    render(<VisitBlock />)
+
+    expect(trackHoursView).not.toHaveBeenCalled()
   })
 
   it('Get Directions link has noopener noreferrer', () => {
@@ -79,8 +88,9 @@ describe('VisitBlock', () => {
 
     const caption = screen.getByText('Trinicanjam Cuisine — Hamilton, Ontario')
     const directions = screen.getByRole('link', { name: /Get Directions/i })
+    const iframe = screen.getByTitle('Trinicanjam Cuisine location map')
 
-    expect(screen.getByText('Map loading…')).toBeInTheDocument()
+    expect(iframe).toBeInTheDocument()
     expect(caption.compareDocumentPosition(directions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

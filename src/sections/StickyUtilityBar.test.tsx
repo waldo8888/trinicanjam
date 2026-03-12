@@ -2,6 +2,7 @@ import { render, screen, act } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useRef } from 'react'
 import { StickyUtilityBar } from './StickyUtilityBar'
+import styles from './StickyUtilityBar.module.css'
 
 // Mock useReducedMotion — default to no preference
 vi.mock('@/lib/useReducedMotion', () => ({
@@ -62,10 +63,10 @@ describe('StickyUtilityBar', () => {
     ;(useReducedMotion as ReturnType<typeof vi.fn>).mockReturnValue(false)
   })
 
-  it('renders with opacity 0 (hidden) on initial mount', () => {
+  it('renders hidden on initial mount', () => {
     renderWithRef()
     const nav = getUtilityNav()
-    expect(nav).toHaveStyle({ opacity: 0, pointerEvents: 'none' })
+    expect(nav.className).not.toContain(styles.visible)
     expect(nav).toHaveAttribute('aria-hidden', 'true')
   })
 
@@ -75,7 +76,7 @@ describe('StickyUtilityBar', () => {
       intersectionCallback([{ isIntersecting: false } as IntersectionObserverEntry])
     })
     const nav = screen.getByRole('navigation', { name: 'Utility navigation' })
-    expect(nav).toHaveStyle({ opacity: 1, pointerEvents: 'auto' })
+    expect(nav.className).toContain(styles.visible)
     expect(nav).toHaveAttribute('aria-hidden', 'false')
   })
 
@@ -88,7 +89,7 @@ describe('StickyUtilityBar', () => {
       intersectionCallback([{ isIntersecting: true } as IntersectionObserverEntry])
     })
     const nav = getUtilityNav()
-    expect(nav).toHaveStyle({ opacity: 0 })
+    expect(nav.className).not.toContain(styles.visible)
   })
 
   it('Menu link navigates to /#menu', () => {
@@ -124,12 +125,21 @@ describe('StickyUtilityBar', () => {
     ;(useReducedMotion as ReturnType<typeof vi.fn>).mockReturnValue(true)
     render(<StickyUtilityBar heroRef={nullHeroRef} />)
     const nav = getUtilityNav()
-    expect(nav).toHaveStyle({ transitionDuration: '0ms' })
+    expect(nav.className).toContain(styles.reducedMotion)
   })
 
   it('nav has aria-label "Utility navigation"', () => {
     render(<StickyUtilityBar heroRef={nullHeroRef} />)
     expect(getUtilityNav()).toBeInTheDocument()
+  })
+
+  it('stays visible without an observed hero when forceVisible is enabled', () => {
+    render(<StickyUtilityBar forceVisible />)
+
+    const nav = getUtilityNav()
+    expect(nav).toHaveAttribute('aria-hidden', 'false')
+    expect(screen.getByRole('link', { name: 'Menu' })).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('link', { name: 'Visit' })).toHaveAttribute('tabindex', '0')
   })
 
   it('calls IntersectionObserver.disconnect() on unmount', () => {

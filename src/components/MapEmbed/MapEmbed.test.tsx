@@ -18,13 +18,16 @@ describe('MapEmbed', () => {
     expect((iframe as HTMLIFrameElement).src).toContain('test-api-key-123')
   })
 
-  it('renders a placeholder when VITE_MAPS_EMBED_KEY is empty', () => {
+  it('renders a fallback iframe when VITE_MAPS_EMBED_KEY is empty', () => {
     vi.stubEnv('VITE_MAPS_EMBED_KEY', '')
 
     render(<MapEmbed />)
 
-    expect(screen.getByText('Map loading…')).toBeInTheDocument()
-    expect(screen.queryByTitle('Trinicanjam Cuisine location map')).not.toBeInTheDocument()
+    const iframe = screen.getByTitle('Trinicanjam Cuisine location map')
+    expect(iframe.tagName).toBe('IFRAME')
+    expect((iframe as HTMLIFrameElement).src).toContain('www.google.com/maps?q=Trinicanjam+Cuisine+Hamilton+Ontario')
+    expect((iframe as HTMLIFrameElement).src).toContain('output=embed')
+    expect((iframe as HTMLIFrameElement).src).not.toContain('/maps/embed/v1/place')
   })
 
   it('renders a figcaption in both states', () => {
@@ -50,6 +53,16 @@ describe('MapEmbed', () => {
     render(<MapEmbed />)
 
     const iframe = screen.getByTitle('Trinicanjam Cuisine location map')
+    expect(iframe).toHaveAttribute('referrerpolicy', 'no-referrer-when-downgrade')
+  })
+
+  it('uses the same iframe attributes for the fallback embed', () => {
+    vi.stubEnv('VITE_MAPS_EMBED_KEY', '')
+
+    render(<MapEmbed />)
+
+    const iframe = screen.getByTitle('Trinicanjam Cuisine location map')
+    expect(iframe).toHaveAttribute('loading', 'lazy')
     expect(iframe).toHaveAttribute('referrerpolicy', 'no-referrer-when-downgrade')
   })
 })
